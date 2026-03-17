@@ -64,17 +64,22 @@ def get_cp_ratio():
         return 1.0
 
 
-def calc_overval_score(iv_rank, iv_pct, hv_premium, hv_iv_ratio, iv_direction):
+def calc_overval_score(option_type, iv_rank, iv_pct, hv_premium, hv_iv_ratio,
+                       iv_direction, cp_ratio):
     """
     매도자 관점 옵션 고평가 점수 (0~100)
-    높을수록 옵션 프리미엄이 비쌈 → 매도 유리
+    콜: C/P 비율 높을수록 고평가 / 풋: C/P 비율 낮을수록 고평가
     """
-    s  = iv_rank * 0.30
-    s += iv_pct  * 0.25
-    # hv_premium > 0 이면 IV > HV (비쌈), 50 기준 선형 변환
-    s += max(0.0, min(100.0, hv_premium * 2.0 + 50.0)) * 0.20
-    # hv_iv_ratio < 1 이면 IV > HV (비쌈)
+    s  = iv_rank * 0.25
+    s += iv_pct  * 0.22
+    s += max(0.0, min(100.0, hv_premium * 2.0 + 50.0)) * 0.18
     s += max(0.0, min(100.0, (1.0 - hv_iv_ratio) * 100.0 + 50.0)) * 0.15
+    # C/P 비율 컴포넌트 — 콜/풋 방향 반대
+    if option_type == "콜":
+        cp_score = min(100.0, max(0.0, (cp_ratio - 0.5) / 1.5 * 100.0))
+    else:
+        cp_score = min(100.0, max(0.0, (1.5 - cp_ratio) / 1.0 * 100.0))
+    s += cp_score * 0.20
     if   iv_direction == "상승": s += 10.0
     elif iv_direction == "하락": s -= 10.0
     return int(min(max(round(s), 0), 100))
