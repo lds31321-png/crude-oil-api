@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원유 옵션 분석 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0c0c0f;--surface:#141418;--surface2:#1c1c22;--surface3:#222228;
+  --border:#2a2a32;--border2:#333340;
+  --text:#f0f0f5;--text2:#a0a0b0;--text3:#606070;
+  --orange:#e07020;--orange-dim:rgba(224,112,32,.15);--orange-border:rgba(224,112,32,.3);
+  --green:#2ec470;--red:#ff4a32;--blue:#4a90e0;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI','Noto Sans KR',sans-serif;}
+
+/* ─── TOPBAR ─── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(12,12,15,.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;
+  display:flex;align-items:center;gap:14px;
+}
+.brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:var(--orange);white-space:nowrap;}
+.brand-icon{font-size:20px;}
+.sep{width:1px;height:24px;background:var(--border2);margin:0 4px;}
+.opt-toggle{display:flex;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:3px;gap:2px;}
+.opt-btn{
+  padding:5px 16px;border-radius:6px;border:none;cursor:pointer;
+  font-size:13px;font-weight:700;transition:.2s;background:transparent;color:var(--text3);
+}
+.opt-btn.active{background:var(--orange);color:#fff;}
+.search-wrap{flex:1;max-width:380px;position:relative;}
+.search-wrap input{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px;outline:none;
+  transition:border-color .2s;
+}
+.search-wrap input:focus{border-color:var(--orange);}
+.run-btn{
+  background:linear-gradient(135deg,#e07020,#b85010);color:#fff;
+  border:none;padding:8px 20px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:700;white-space:nowrap;transition:.15s;
+}
+.run-btn:hover{filter:brightness(1.1);}
+.run-btn:active{filter:brightness(.9);}
+
+/* ─── LAYOUT ─── */
+.main{padding:20px 24px;max-width:1400px;margin:0 auto;}
+
+/* ─── PLACEHOLDER ─── */
+.placeholder{
+  margin-top:80px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.ph-icon{font-size:56px;line-height:1;}
+.ph-title{font-size:22px;font-weight:800;color:var(--text2);}
+.ph-sub{font-size:14px;color:var(--text3);line-height:1.7;}
+.ph-tags{display:flex;gap:8px;margin-top:8px;}
+.ph-tag{
+  background:var(--orange-dim);border:1px solid var(--orange-border);
+  color:var(--orange);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;
+}
+
+/* ─── LOADER ─── */
+.loader{margin-top:100px;text-align:center;display:none;}
+.loader.on{display:block;}
+.spinner{width:44px;height:44px;border:3px solid var(--border2);border-top-color:var(--orange);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-msg{font-size:13px;color:var(--text3);}
+
+/* ─── DASHBOARD ─── */
+.dash{display:none;}
+.dash.on{display:block;}
+
+.wti-strip{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 18px;margin-bottom:14px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+.wti-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);}
+.wti-item b{font-size:14px;font-weight:800;}
+.wti-pos{color:#2ec470;}
+.wti-neg{color:#ff4a32;}
+.wti-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);}
+.strip-src{margin-left:auto;font-size:11px;color:var(--text3);}
+
+/* dash header */
+.dash-head{
+  background:linear-gradient(135deg,var(--surface),#1a1200);
+  border:1px solid var(--border);border-radius:12px;
+  padding:14px 20px;margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.dash-title{font-size:17px;font-weight:800;}
+.dash-pill{
+  background:var(--orange-dim);border:1px solid var(--orange-border);
+  color:var(--orange);padding:5px 16px;border-radius:20px;font-size:13px;font-weight:800;
+}
+
+/* ─── TOP ROW: gauge + metrics ─── */
+.top-row{display:grid;grid-template-columns:240px 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:700px){.top-row{grid-template-columns:1fr;}}
+
+.gauge-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:20px 16px 16px;display:flex;flex-direction:column;align-items:center;
+}
+.gauge-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.gauge-svg{width:100%;max-width:220px;}
+.gauge-score{font-size:52px;font-weight:900;line-height:1;margin-top:-8px;}
+.gauge-verdict{
+  margin-top:10px;padding:5px 18px;border-radius:20px;font-size:12px;font-weight:700;
+  border:1px solid;
+}
+.gauge-range{
+  display:flex;justify-content:space-between;width:100%;
+  font-size:10px;color:var(--text3);margin-top:8px;padding:0 6px;
+}
+
+/* ─── 6 METRIC CARDS ─── */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+@media(max-width:500px){.metrics{grid-template-columns:repeat(2,1fr);}}
+.mc{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 12px;position:relative;overflow:hidden;
+}
+.mc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--mc-accent,var(--orange));
+}
+.mc-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.mc-value{font-size:26px;font-weight:900;line-height:1.1;}
+.mc-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* ─── ALERT ─── */
+.alert{
+  background:rgba(255,74,50,.07);border:1px solid rgba(255,74,50,.3);
+  border-left:3px solid #ff4a32;border-radius:10px;
+  padding:12px 18px;margin-bottom:14px;
+}
+.alert-head{font-size:13px;font-weight:700;color:#ff6a52;margin-bottom:5px;}
+.alert-body{font-size:12px;color:#ffb090;line-height:1.7;}
+
+/* ─── TWO COLUMNS: factor + ovx chart ─── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;
+}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.chart-wrap{position:relative;}
+
+/* ─── COMMENTARY ─── */
+.commentary{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:20px;
+}
+.comm-title{
+  font-size:15px;font-weight:800;color:var(--orange);
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.comm-p{font-size:13px;color:var(--text2);line-height:1.85;margin-bottom:10px;}
+.comm-p:last-child{margin-bottom:0;}
+
+/* ─── MISC ─── */
+.hidden{display:none!important;}
+.err{background:rgba(255,74,50,.08);border:1px solid rgba(255,74,50,.35);border-radius:10px;padding:18px;color:#ff8877;font-size:13px;line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-icon">🛢</span>원유 옵션 분석</div>
+  <div class="sep"></div>
+  <div class="opt-toggle">
+    <button class="opt-btn active" id="btnCall" onclick="setOpt('콜')">콜(Call)</button>
+    <button class="opt-btn"        id="btnPut"  onclick="setOpt('풋')">풋(Put)</button>
+  </div>
+  <div class="search-wrap">
+    <input id="searchInput" type="text" placeholder="예: 원유 콜,  WTI put,  분석 시작..." value="">
+  </div>
+  <button class="run-btn" onclick="run()">📊 분석 실행</button>
+</div>
+
+<div class="main">
+
+  <!-- Placeholder -->
+  <div class="placeholder" id="placeholder">
+    <div class="ph-icon">🛢</div>
+    <div class="ph-title">원유 옵션 프리미엄 분석기</div>
+    <div class="ph-sub">
+      상단에서 <b>콜(Call)</b> 또는 <b>풋(Put)</b> 옵션 종류를 선택하고<br>
+      <b>분석 실행</b> 버튼을 누르면 실시간 OVX·WTI 데이터로<br>
+      옵션 매수 적합도를 분석해 드립니다.
+    </div>
+    <div class="ph-tags">
+      <span class="ph-tag">IVR · IV 백분위</span>
+      <span class="ph-tag">HV 프리미엄</span>
+      <span class="ph-tag">OVX 추이</span>
+      <span class="ph-tag">C/P 비율</span>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <div class="load-msg" id="loadMsg">Yahoo Finance 데이터 수집 중...</div>
+  </div>
+
+  <!-- Dashboard (fixed structure) -->
+  <div class="dash" id="dash">
+    <div id="wtiStrip"></div>
+    <div id="dashHead"></div>
+
+    <div class="top-row">
+      <div class="gauge-card">
+        <div class="gauge-label">매수 적합도 점수</div>
+        <svg id="gaugeSvg" class="gauge-svg" viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#2ec470"/>
+              <stop offset="45%"  stop-color="#e07020"/>
+              <stop offset="100%" stop-color="#ff4a32"/>
+            </linearGradient>
+          </defs>
+          <!-- track -->
+          <path id="gTrack" d="M 20 128 A 100 100 0 0 1 220 128"
+            fill="none" stroke="#222230" stroke-width="14" stroke-linecap="round"/>
+          <!-- fill -->
+          <path id="gFill" d="M 20 128 A 100 100 0 0 1 220 128"
+            fill="none" stroke="url(#gGrad)" stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="314" stroke-dashoffset="314"/>
+          <!-- ticks -->
+          <g id="gTicks" stroke="#333340" stroke-width="1.5" fill="none"></g>
+          <!-- labels -->
+          <g id="gLabels" fill="#44445a" font-size="9" text-anchor="middle"></g>
+          <!-- dot -->
+          <circle id="gDot" cx="120" cy="28" r="5" fill="var(--orange)" opacity="0"/>
+        </svg>
+        <div class="gauge-score" id="gaugeScore">-</div>
+        <div class="gauge-label" style="margin-top:4px;margin-bottom:0">/ 100점</div>
+        <div class="gauge-verdict" id="gaugeVerdict">-</div>
+        <div class="gauge-range"><span>0</span><span>50</span><span>100</span></div>
+      </div>
+
+      <div class="metrics" id="metricsGrid"></div>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">📊 매수 적합도 요인 분석</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="factorChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 OVX 변동성 지수 추이 (최근 90일)</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="ovxChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="commentary" id="commentary"></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ── State ── */
+let currentOpt = '콜';
+let factorChartInst = null;
+let ovxChartInst = null;
+const LOAD_MSGS = [
+  'Yahoo Finance 데이터 수집 중...',
+  'OVX · HV 지표 계산 중...',
+  '매수 적합도 분석 중...',
+  '대시보드 생성 중...'
+];
+
+/* ── Option toggle ── */
+function setOpt(opt) {
+  currentOpt = opt;
+  document.getElementById('btnCall').classList.toggle('active', opt === '콜');
+  document.getElementById('btnPut').classList.toggle('active',  opt === '풋');
+}
+
+/* ── Gauge SVG helpers ── */
+const G = { cx: 120, cy: 128, r: 100 };  // upper semicircle
+
+function gPolar(scorePct) {
+  // angle in standard math: 180° (left) → 0° (right), upper half
+  const a = Math.PI * (1 - scorePct / 100);
+  return {
+    x: G.cx + G.r * Math.cos(a),
+    y: G.cy - G.r * Math.sin(a)   // minus because SVG y-down
+  };
+}
+
+function gArcPath(from, to) {
+  const s = gPolar(from), e = gPolar(to);
+  const span = (to - from) / 100 * Math.PI;   // arc length in radians
+  const large = span > Math.PI ? 1 : 0;
+  return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${G.r} ${G.r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+}
+
+function drawGaugeTicks() {
+  const ticks = [0, 25, 50, 75, 100];
+  let tickHtml = '', labelHtml = '';
+  ticks.forEach(v => {
+    const p = gPolar(v);
+    const pi = gPolar(v);  // same for inner offset
+    const a = Math.PI * (1 - v / 100);
+    const ix = G.cx + (G.r - 10) * Math.cos(a);
+    const iy = G.cy - (G.r - 10) * Math.sin(a);
+    const ox = G.cx + (G.r + 4)  * Math.cos(a);
+    const oy = G.cy - (G.r + 4)  * Math.sin(a);
+    tickHtml += `<line x1="${ix.toFixed(1)}" y1="${iy.toFixed(1)}" x2="${ox.toFixed(1)}" y2="${oy.toFixed(1)}"/>`;
+    const lx = G.cx + (G.r + 16) * Math.cos(a);
+    const ly = G.cy - (G.r + 16) * Math.sin(a);
+    labelHtml += `<text x="${lx.toFixed(1)}" y="${(ly+3).toFixed(1)}">${v}</text>`;
+  });
+  document.getElementById('gTicks').innerHTML  = tickHtml;
+  document.getElementById('gLabels').innerHTML = labelHtml;
+}
+
+function updateGauge(score) {
+  const totalLen = Math.PI * G.r;  // ≈ 314
+  const fill = document.getElementById('gFill');
+  fill.setAttribute('stroke-dasharray', totalLen.toFixed(1));
+  fill.setAttribute('stroke-dashoffset', (totalLen * (1 - score / 100)).toFixed(1));
+
+  // dot
+  const dot = document.getElementById('gDot');
+  const p = gPolar(score);
+  dot.setAttribute('cx', p.x.toFixed(2));
+  dot.setAttribute('cy', p.y.toFixed(2));
+  dot.setAttribute('opacity', score > 0 ? '1' : '0');
+}
+
+/* ── Color helpers ── */
+function scoreColor(s) {
+  if (s >= 70) return '#2ec470';
+  if (s >= 50) return '#e07020';
+  return '#ff4a32';
+}
+function verdictBg(s) {
+  if (s >= 70) return 'rgba(46,196,112,.12)';
+  if (s >= 50) return 'rgba(224,112,32,.12)';
+  return 'rgba(255,74,50,.12)';
+}
+function ivDirColor(d) {
+  return d === '상승' ? '#ff4a32' : d === '하락' ? '#2ec470' : '#a0a0b0';
+}
+function pctColor(pct, invert) {
+  const v = invert ? (100 - pct) : pct;
+  if (v >= 70) return '#ff4a32';
+  if (v >= 40) return '#e07020';
+  return '#2ec470';
+}
+
+/* ── Run ── */
+async function run() {
+  // infer option type from text input if filled
+  const q = document.getElementById('searchInput').value.trim();
+  if (q) {
+    if (/풋|put/i.test(q)) setOpt('풋');
+    else if (/콜|call/i.test(q)) setOpt('콜');
+  }
+
+  document.getElementById('placeholder').classList.add('hidden');
+  document.getElementById('dash').classList.remove('on');
+  const loader = document.getElementById('loader');
+  loader.classList.add('on');
+
+  let mi = 0;
+  const iv = setInterval(() => {
+    document.getElementById('loadMsg').textContent = LOAD_MSGS[Math.min(mi++, LOAD_MSGS.length - 1)];
+  }, 1600);
+
+  try {
+    const url = `/analyze?option_type=${encodeURIComponent(currentOpt)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`서버 오류 ${res.status}`);
+    const d = await res.json();
+    if (d.error) throw new Error(d.error);
+    clearInterval(iv);
+    loader.classList.remove('on');
+    render(d);
+  } catch (e) {
+    clearInterval(iv);
+    loader.classList.remove('on');
+    document.getElementById('dash').innerHTML =
+      `<div class="err">⚠️ <b>오류 발생:</b> ${e.message}<br><br>FastAPI 서버가 실행 중인지 확인하세요:<br><code>python main.py</code></div>`;
+    document.getElementById('dash').classList.add('on');
+  }
+}
+
+/* ── Render ── */
+function render(d) {
+  const sc = Math.min(Math.max(d.score || 0, 0), 100);
+  const col = scoreColor(sc);
+  const verdict = d.verdict || '-';
+  const isCall = d.option_type_raw === '콜';
+
+  /* WTI strip */
+  const r5 = d.wti_ret5 || 0;
+  const r20 = d.wti_ret20 || 0;
+  const rc = (v) => v >= 0 ? 'wti-pos' : 'wti-neg';
+  const rs = (v) => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+  document.getElementById('wtiStrip').innerHTML = `
+    <div class="wti-strip">
+      <div class="wti-item"><span class="wti-dot"></span><span>WTI</span><b>$${d.wti_price}</b></div>
+      <div class="wti-item"><span>5일 수익률</span><b class="${rc(r5)}">${rs(r5)}</b></div>
+      <div class="wti-item"><span>20일 수익률</span><b class="${rc(r20)}">${rs(r20)}</b></div>
+      <div class="wti-item"><span>OVX</span><b>${d.ovx_current}</b></div>
+      <div class="wti-item"><span>52주 범위</span><b>${d.ovx_52w_lo} – ${d.ovx_52w_hi}</b></div>
+      <div class="strip-src">📡 ${d.data_source} &nbsp;|&nbsp; 🕐 ${d.updated_at}</div>
+    </div>`;
+
+  /* Header */
+  document.getElementById('dashHead').innerHTML = `
+    <div class="dash-head">
+      <div class="dash-title">🛢 원유 ${isCall ? '콜(Call)' : '풋(Put)'} 옵션 매수 적합도 분석</div>
+      <div class="dash-pill">${d.option_type}</div>
+    </div>`;
+
+  /* Gauge */
+  drawGaugeTicks();
+  updateGauge(sc);
+  document.getElementById('gaugeScore').textContent = sc;
+  document.getElementById('gaugeScore').style.color = col;
+  const vEl = document.getElementById('gaugeVerdict');
+  vEl.textContent = '● ' + verdict;
+  vEl.style.color = col;
+  vEl.style.borderColor = col;
+  vEl.style.background = verdictBg(sc);
+
+  /* 6 metric cards */
+  const ivDirCol = ivDirColor(d.iv_direction);
+  const hpCol = d.hv_premium > 5 ? '#ff4a32' : d.hv_premium < 0 ? '#2ec470' : '#e07020';
+  const ratioCol = d.hv_iv_ratio < 0.8 ? '#ff4a32' : d.hv_iv_ratio > 1.1 ? '#2ec470' : '#e07020';
+  const cpCol = isCall
+    ? (d.call_put_ratio > 1.2 ? '#2ec470' : d.call_put_ratio < 0.8 ? '#ff4a32' : '#e07020')
+    : (d.call_put_ratio < 0.8 ? '#2ec470' : d.call_put_ratio > 1.2 ? '#ff4a32' : '#e07020');
+  const ivrCol = isCall
+    ? pctColor(d.iv_rank, true)
+    : pctColor(d.iv_rank, false);
+  const ivpCol = isCall
+    ? pctColor(d.iv_percentile, true)
+    : pctColor(d.iv_percentile, false);
+
+  function mc(accentColor, label, value, sub) {
+    return `<div class="mc" style="--mc-accent:${accentColor}">
+      <div class="mc-label">${label}</div>
+      <div class="mc-value" style="color:${accentColor}">${value}</div>
+      <div class="mc-sub">${sub}</div>
+    </div>`;
+  }
+
+  document.getElementById('metricsGrid').innerHTML =
+    mc(ivrCol,   'IVR (IV Rank)',      d.iv_rank,              '0 = 저평가  ·  100 = 고평가') +
+    mc(ivpCol,   'IV 백분위',           d.iv_percentile + '%',  '과거 대비 현재 IV 수준') +
+    mc(ivDirCol, 'IV 방향성',           d.iv_direction,         '최근 10일 추세') +
+    mc(hpCol,    'HV 대비 프리미엄',    (d.hv_premium >= 0 ? '+' : '') + d.hv_premium + 'pt', `HV ${d.hv}  vs  IV ${d.ovx_current}`) +
+    mc(ratioCol, 'HV / IV 비율',       d.hv_iv_ratio,          '1.0 기준 · 낮을수록 IV 고평가') +
+    mc(cpCol,    'C/P 비율',           d.call_put_ratio,       '>1 콜수요 강세  ·  <1 풋수요 강세');
+
+  /* Alert */
+  const alertIcon = sc >= 55 ? '✅' : sc >= 40 ? '🟡' : '⚠️';
+  const alertTitle = sc >= 55 ? '진입 적합 신호' : sc >= 40 ? '중립 신호' : '진입 주의 신호';
+  document.getElementById('alertBox').innerHTML = `
+    <div class="alert">
+      <div class="alert-head">${alertIcon} ${alertTitle}</div>
+      <div class="alert-body">
+        현재 OVX ${d.ovx_current} (IV Rank ${d.iv_rank}, 백분위 ${d.iv_percentile}%)로
+        HV ${d.hv} 대비 <b>${d.hv_premium >= 0 ? '+' : ''}${d.hv_premium}pt</b> 프리미엄.
+        C/P 비율 ${d.call_put_ratio} · IV 방향 ${d.iv_direction} →
+        <b>${isCall ? '콜' : '풋'} 매수 적합도 ${sc}점 (${verdict})</b>
+      </div>
+    </div>`;
+
+  /* Factor chart */
+  const factors = d.factors || [];
+  const fLabels = factors.map(f => f.name);
+  const fVals   = factors.map(f => f.pct);
+  const fColors = fVals.map(v =>
+    v >= 70 ? 'rgba(46,196,112,.75)' : v >= 40 ? 'rgba(224,112,32,.75)' : 'rgba(255,74,50,.75)'
+  );
+  const fBorder = fVals.map(v =>
+    v >= 70 ? '#2ec470' : v >= 40 ? '#e07020' : '#ff4a32'
+  );
+
+  if (factorChartInst) factorChartInst.destroy();
+  const fCtx = document.getElementById('factorChart').getContext('2d');
+  factorChartInst = new Chart(fCtx, {
+    type: 'bar',
+    data: {
+      labels: fLabels,
+      datasets: [{
+        data: fVals,
+        backgroundColor: fColors,
+        borderColor: fBorder,
+        borderWidth: 1,
+        borderRadius: 4,
+        barThickness: 22,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c1c22',
+          borderColor: '#333340',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => `  ${ctx.parsed.x}점`
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(255,255,255,.04)' },
+          ticks: { color: '#55556a', font: { size: 10 } },
+          border: { color: 'transparent' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#a0a0b0', font: { size: 11 } },
+          border: { color: 'transparent' }
+        }
+      }
+    }
+  });
+
+  /* OVX history chart */
+  const hist = d.ovx_history || [];
+  const hLabels = hist.map(h => h.date.slice(5));  // MM-DD
+  const hVals   = hist.map(h => h.value);
+  const avgOvx  = hVals.reduce((a, b) => a + b, 0) / (hVals.length || 1);
+
+  if (ovxChartInst) ovxChartInst.destroy();
+  const oCtx = document.getElementById('ovxChart').getContext('2d');
+
+  // gradient fill
+  const grad = oCtx.createLinearGradient(0, 0, 0, 200);
+  grad.addColorStop(0,   'rgba(224,112,32,.35)');
+  grad.addColorStop(1,   'rgba(224,112,32,.0)');
+
+  // thin the labels for readability (every ~10 points)
+  const step = Math.ceil(hLabels.length / 10);
+  const sparse = hLabels.map((l, i) => i % step === 0 ? l : '');
+
+  ovxChartInst = new Chart(oCtx, {
+    type: 'line',
+    data: {
+      labels: hLabels,
+      datasets: [
+        {
+          label: 'OVX',
+          data: hVals,
+          borderColor: '#e07020',
+          borderWidth: 2,
+          backgroundColor: grad,
+          fill: true,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: 0.35,
+        },
+        {
+          label: '평균',
+          data: hVals.map(() => parseFloat(avgOvx.toFixed(2))),
+          borderColor: 'rgba(100,100,160,.5)',
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#606070', boxWidth: 14, font: { size: 10 } }
+        },
+        tooltip: {
+          backgroundColor: '#1c1c22',
+          borderColor: '#333340',
+          borderWidth: 1,
+          callbacks: {
+            title: ctx => hLabels[ctx[0].dataIndex],
+            label: ctx => ctx.dataset.label === 'OVX'
+              ? `  OVX  ${ctx.parsed.y}`
+              : `  평균  ${ctx.parsed.y}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: '#55556a',
+            font: { size: 9 },
+            maxRotation: 0,
+            callback: (_, i) => sparse[i]
+          },
+          border: { color: 'transparent' }
+        },
+        y: {
+          position: 'right',
+          grid: { color: 'rgba(255,255,255,.04)' },
+          ticks: { color: '#55556a', font: { size: 10 } },
+          border: { color: 'transparent' }
+        }
+      }
+    }
+  });
+
+  /* Commentary */
+  const commLines = (d.commentary || []).map(p =>
+    `<p class="comm-p">${p}</p>`
+  ).join('');
+  document.getElementById('commentary').innerHTML = `
+    <div class="comm-title">
+      📝 ${isCall ? '콜(Call)' : '풋(Put)'} 옵션 매수 적합도 분석 리포트
+    </div>
+    ${commLines}`;
+
+  document.getElementById('dash').classList.add('on');
+}
+
+/* ── Keyboard shortcuts ── */
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') run();
+});
+
+/* ── Auto-infer opt from typing ── */
+document.getElementById('searchInput').addEventListener('input', e => {
+  const v = e.target.value;
+  if (/풋|put/i.test(v)) setOpt('풋');
+  else if (/콜|call/i.test(v)) setOpt('콜');
+});
+</script>
+</body>
+</html>
