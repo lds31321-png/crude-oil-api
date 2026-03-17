@@ -397,7 +397,7 @@ function render(d) {
   const s  = Math.min(Math.max(d.score || 0, 0), 100);
   const col = sc(s), bg = scBg(s), bd = scBd(s);
   const v  = d.verdict || (s>=70?'고평가':s>=40?'적정':'저평가');
-  const isCall = d.option_type === '콜';
+  const isCall = opt === '콜';
   const optLabel = isCall ? '콜(Call)' : '풋(Put)';
 
   /* WTI strip */
@@ -458,9 +458,9 @@ function render(d) {
 
   /* alert box */
   const aIcon  = s>=70?'🔴':s>=40?'🟡':'🟢';
-  const aTitle = s>=70?'고평가 경고 — 옵션 매도 환경':
-                 s>=40?'적정 수준 — 중립 환경':
-                       '저평가 — 옵션 매수 환경';
+  const aTitle = s>=70?'고평가 경고 — 옵션 프리미엄 고평가 구간':
+                 s>=40?'적정 수준 — 중립 구간':
+                       '저평가 — 옵션 프리미엄 저평가 구간';
   document.getElementById('alertBox').innerHTML = `
     <div class="alert">
       <div class="al-head">${aIcon} ${aTitle}</div>
@@ -472,6 +472,9 @@ function render(d) {
         → <b>${optLabel}</b> 고평가 점수 <b style="color:${col}">${s}점 (${v})</b>
       </div>
     </div>`;
+
+  /* 차트 생성 전 먼저 대시보드를 표시해야 canvas 크기가 올바르게 인식됨 */
+  document.getElementById('dash').classList.add('on');
 
   /* factor chart (horizontal bar) */
   const factors = d.factors || [];
@@ -601,8 +604,6 @@ function render(d) {
       📝 원유 ${optLabel} 옵션 프리미엄 고평가 분석 리포트
     </div>
     ${lines}`;
-
-  document.getElementById('dash').classList.add('on');
 }
 
 /* ──────────── keyboard / input ──────────── */
