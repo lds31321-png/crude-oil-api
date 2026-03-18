@@ -173,7 +173,7 @@ def calc_factors(iv_pct, hv_premium, ovx_cur, cp, iv_rank, option_type, wti_ret5
 @app.get("/analyze")
 async def analyze(option_type: str = "콜"):
     try:
-        ovx_df = yf.Ticker("^OVX").history(period="2y")
+        ovx_df = yf.Ticker("^OVX").history(period="5y")
         ovx_1y = ovx_df["Close"].iloc[-252:]
         ovx_cur = round(float(ovx_df["Close"].iloc[-1]), 2)
 
