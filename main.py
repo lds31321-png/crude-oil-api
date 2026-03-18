@@ -15,6 +15,7 @@ app.add_middleware(
 )
 
 # ── 종목 설정 ──────────────────────────────────────────
+# vol_ticker: 공식 변동성 지수가 있으면 사용, 없으면 None (HV로 대체)
 ASSETS = {
     "원유": {
         "ticker": "CL=F",
@@ -53,28 +54,28 @@ ASSETS = {
     },
     "천연가스": {
         "ticker": "NG=F",
-        "vol_ticker": "^OVX",
+        "vol_ticker": None,
         "name": "천연가스",
         "unit": "$",
         "emoji": "⛽",
     },
     "대두": {
         "ticker": "ZS=F",
-        "vol_ticker": "^OVX",
+        "vol_ticker": None,
         "name": "대두",
         "unit": "$",
         "emoji": "🫘",
     },
     "호주달러": {
         "ticker": "AUDUSD=X",
-        "vol_ticker": "^OVX",
+        "vol_ticker": "^EVZ",
         "name": "AUD/USD",
         "unit": "",
         "emoji": "🇦🇺",
     },
     "aud": {
         "ticker": "AUDUSD=X",
-        "vol_ticker": "^OVX",
+        "vol_ticker": "^EVZ",
         "name": "AUD/USD",
         "unit": "",
         "emoji": "🇦🇺",
@@ -97,12 +98,11 @@ ASSETS = {
 
 
 def find_asset(asset_str: str):
-    """입력 문자열에서 자산 찾기"""
     s = asset_str.strip().lower()
     for key, val in ASSETS.items():
         if key in s:
             return key, val
-    return "원유", ASSETS["원유"]  # 기본값
+    return "원유", ASSETS["원유"]
 
 
 def calc_hv(prices, window=30):
@@ -137,11 +137,17 @@ def get_cp_ratio(ticker):
         return 1.0
 
 
-def ovx_5points(df, asset_name):
-    """역사적 5개 포인트"""
+def remove_tz(df):
+    """타임존 제거"""
     if hasattr(df.index, "tz") and df.index.tz is not None:
         df = df.copy()
         df.index = df.index.tz_localize(None)
+    return df
+
+
+def vol_5points(df, asset_name):
+    """변동성 역사적 5개 포인트"""
+    df = remove_tz(df)
     points = [
         ("21Q4", "2021-11-15"),
         ("22Q2", "2022-05-10"),
@@ -159,6 +165,19 @@ def ovx_5points(df, asset_name):
         result.append({"label": label, "value": val})
     result.append({"label": "현재", "value": round(float(df["Close"].iloc[-1]), 1)})
     return result
+
+
+def hv_to_vol_series(price_df, window=30):
+    """
+    변동성 지수가 없는 종목은 rolling HV로 변동성 시계열 생성
+    실제 가격 데이터 기반 → 임의값 아님
+    """
+    log_ret = np.log(price_df["Close"] / price_df["Close"].shift(1))
+    hv_series = log_ret.rolling(window).std() * np.sqrt(252) * 100
+    hv_series = hv_series.dropna()
+    # Close 컬럼으로 DataFrame 생성
+    vol_df = pd.DataFrame({"Close": hv_series})
+    return vol_df
 
 
 def calc_score(iv_rank, iv_pct, hv_premium, ratio, direction, cp, option_type, ret5):
@@ -229,21 +248,19 @@ def calc_factors(iv_pct, hv_premium, vol_cur, cp, iv_rank, option_type, ret5):
 @app.get("/analyze")
 async def analyze(option_type: str = "콜", asset: str = "원유"):
     try:
-        # 자산 찾기
         asset_key, asset_info = find_asset(asset)
         ticker = asset_info["ticker"]
         vol_ticker = asset_info["vol_ticker"]
         asset_name = asset_info["name"]
         emoji = asset_info["emoji"]
+        has_vol_index = vol_ticker is not None
 
-        # 변동성 지수 데이터
-        vol_df = yf.Ticker(vol_ticker).history(period="5y")
-        vol_1y = vol_df["Close"].iloc[-252:]
-        vol_cur = round(float(vol_df["Close"].iloc[-1]), 2)
-
-        # 기초자산 데이터
-        price_df = yf.Ticker(ticker).history(period="1y")
-        price_cur = round(float(price_df["Close"].iloc[-1]), 2)
+        # 기초자산 가격 데이터
+        price_df = yf.Ticker(ticker).history(period="2y")
+        price_df = remove_tz(price_df)
+        price_cur = round(
+            float(price_df["Close"].iloc[-1]), 4 if "USD" in ticker else 2
+        )
         ret5 = (
             round(
                 (price_df["Close"].iloc[-1] / price_df["Close"].iloc[-6] - 1) * 100, 2
@@ -259,7 +276,26 @@ async def analyze(option_type: str = "콜", asset: str = "원유"):
             else 0.0
         )
 
+        # HV 계산 (실제 가격 기반)
         hv = calc_hv(price_df["Close"])
+
+        # 변동성 지수 처리
+        if has_vol_index:
+            # 공식 변동성 지수 사용 (원유: OVX, 골드: GVZ, S&P: VIX, 국채: MOVE, 호주달러: EVZ)
+            vol_df = yf.Ticker(vol_ticker).history(period="5y")
+            vol_df = remove_tz(vol_df)
+            vol_1y = vol_df["Close"].iloc[-252:]
+            vol_cur = round(float(vol_df["Close"].iloc[-1]), 2)
+            vol_label = vol_ticker.replace("^", "")
+            data_note = f"공식 변동성 지수({vol_label}) 사용"
+        else:
+            # 변동성 지수 없는 종목: 실제 가격으로 rolling HV 계산
+            vol_df = hv_to_vol_series(price_df)
+            vol_1y = vol_df["Close"].iloc[-252:]
+            vol_cur = round(float(vol_df["Close"].iloc[-1]), 2)
+            vol_label = "HV(실제가격기반)"
+            data_note = f"공식 변동성 지수 없음 → 실제 가격 기반 HV 사용"
+
         iv_rank, iv_pct = calc_iv_rank(vol_1y)
         direction = get_direction(vol_1y)
         hv_premium = round(vol_cur - hv, 2)
@@ -279,13 +315,13 @@ async def analyze(option_type: str = "콜", asset: str = "원유"):
 
         if option_type == "콜":
             comm = [
-                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성 지수는 {vol_cur}입니다.",
+                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성({vol_label})은 {vol_cur}입니다.",
                 f"내재변동성(IV) {vol_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. {'상승' if ret5 > 0 else '하락'} 추세에서 콜 옵션 수요가 {'증가' if ret5 > 2 else '보통'}하고 있습니다.",
                 f"IV Rank {iv_rank}, IV 백분위 {iv_pct}%로 {verdict} 수준입니다. 콜/풋 비율 {cp}로 {'콜 수요 우세' if cp > 1 else '풋 수요 우세'}한 상황이며 콜 프리미엄 고평가 점수는 {score}점입니다.",
             ]
         else:
             comm = [
-                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성 지수는 {vol_cur}입니다.",
+                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성({vol_label})은 {vol_cur}입니다.",
                 f"내재변동성(IV) {vol_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. {'하락' if ret5 < 0 else '상승'} 추세에서 풋 옵션 수요가 {'증가' if ret5 < -2 else '보통'}하고 있습니다.",
                 f"IV Rank {iv_rank}, IV 백분위 {iv_pct}%로 {verdict} 수준입니다. 콜/풋 비율 {cp}로 {'풋 수요 우세' if cp < 1 else '콜 수요 우세'}한 상황이며 풋 프리미엄 고평가 점수는 {score}점입니다.",
             ]
@@ -301,7 +337,9 @@ async def analyze(option_type: str = "콜", asset: str = "원유"):
             "ret5": ret5,
             "ret20": ret20,
             "vol_current": vol_cur,
-            "vol_ticker": vol_ticker,
+            "vol_ticker": vol_label,
+            "has_vol_index": has_vol_index,
+            "data_note": data_note,
             "iv_rank": iv_rank,
             "iv_percentile": f"{iv_pct}%",
             "iv_direction": direction,
@@ -310,11 +348,11 @@ async def analyze(option_type: str = "콜", asset: str = "원유"):
             "iv_hv_ratio": ratio,
             "call_put_ratio": cp,
             "factors": factors,
-            "ovx_history": ovx_5points(vol_df, asset_name),
-            "alert_message": f"현재 {asset_name} {option_type} 옵션 IV({vol_cur})가 HV({hv})보다 {hv_premium}포인트 높습니다. {option_type} 프리미엄 고평가 점수 {score}점으로 {verdict} 구간입니다.",
+            "ovx_history": vol_5points(vol_df, asset_name),
+            "alert_message": f"현재 {asset_name} {option_type} 옵션 변동성({vol_label}) {vol_cur}이 HV({hv})보다 {hv_premium}포인트 높습니다. {option_type} 프리미엄 고평가 점수 {score}점으로 {verdict} 구간입니다.",
             "commentary_title": f"{asset_name} {option_type}옵션 {verdict} 분석",
             "commentary": comm,
-            "data_source": "Yahoo Finance — 약 15~20분 지연 데이터",
+            "data_source": f"Yahoo Finance — 약 15~20분 지연 | {data_note}",
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M KST"),
         }
     except Exception as e:
