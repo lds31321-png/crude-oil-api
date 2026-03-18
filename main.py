@@ -98,21 +98,37 @@ ASSETS = {
         "unit": "$",
         "emoji": "🥇",
     },
-    "천연가스": {
-        "ticker": "NG=F",
-        "vol_ticker": None,
+    "나스닥": {
+        "ticker": "NQ=F",
+        "vol_ticker": "^VXN",
         "iv_etf": None,
-        "name": "천연가스",
+        "name": "나스닥100",
         "unit": "$",
-        "emoji": "⛽",
+        "emoji": "💻",
     },
-    "대두": {
-        "ticker": "ZS=F",
-        "vol_ticker": None,
-        "iv_etf": "SOYB",
-        "name": "대두",
+    "nasdaq": {
+        "ticker": "NQ=F",
+        "vol_ticker": "^VXN",
+        "iv_etf": None,
+        "name": "나스닥100",
         "unit": "$",
-        "emoji": "🫘",
+        "emoji": "💻",
+    },
+    "은": {
+        "ticker": "SI=F",
+        "vol_ticker": "^VXSLV",
+        "iv_etf": None,
+        "name": "은(Silver)",
+        "unit": "$",
+        "emoji": "🥈",
+    },
+    "silver": {
+        "ticker": "SI=F",
+        "vol_ticker": "^VXSLV",
+        "iv_etf": None,
+        "name": "은(Silver)",
+        "unit": "$",
+        "emoji": "🥈",
     },
     
     "국채": {
