@@ -79,9 +79,36 @@ body{background:#0d0d0f;color:#f0f0f5;font-family:'Segoe UI',sans-serif;font-siz
 </div>
 <div class="main">
   <div class="placeholder" id="ph">
-    <div style="font-size:52px;margin-bottom:16px;">📊</div>
-    <h3 style="font-size:18px;color:#b0b0c0;margin-bottom:8px;">옵션 프리미엄 분석기</h3>
-    <p style="font-size:13px;color:#555;line-height:1.8;">분석하고 싶은 종목과 옵션 종류를 입력하세요.<br><br><code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">원유 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">골드 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">S&P 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">천연가스 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">대두 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">호주달러 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">국채 콜</code></p>
+    <div style="font-size:48px;margin-bottom:16px;">📊</div>
+    <h3 style="font-size:20px;color:#f0f0f5;margin-bottom:16px;font-weight:800;">옵션 프리미엄 고평가 분석기</h3>
+    <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.8;">CBOE·ICE 공식 변동성 지수 기반으로 옵션 프리미엄의 고평가 여부를 분석합니다.<br>상단 입력창에 종목명과 콜/풋을 입력 후 <b style="color:#f0a040;">분석 실행</b>을 누르세요.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;margin:0 auto 20px;">
+      <div style="background:#1a1a24;border:1px solid #2a2a3a;border-radius:10px;padding:14px;text-align:left;">
+        <div style="font-size:20px;margin-bottom:6px;">🛢</div>
+        <div style="font-size:14px;font-weight:700;color:#f0f0f5;margin-bottom:4px;">WTI 원유</div>
+        <div style="font-size:11px;color:#f0a040;margin-bottom:6px;">변동성 지수: OVX (CBOE)</div>
+        <div style="font-size:12px;color:#555;">입력: <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">원유 콜</code> <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">원유 풋</code></div>
+      </div>
+      <div style="background:#1a1a24;border:1px solid #2a2a3a;border-radius:10px;padding:14px;text-align:left;">
+        <div style="font-size:20px;margin-bottom:6px;">📈</div>
+        <div style="font-size:14px;font-weight:700;color:#f0f0f5;margin-bottom:4px;">S&P500 지수</div>
+        <div style="font-size:11px;color:#f0a040;margin-bottom:6px;">변동성 지수: VIX (CBOE)</div>
+        <div style="font-size:12px;color:#555;">입력: <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">지수 콜</code> <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">지수 풋</code></div>
+      </div>
+      <div style="background:#1a1a24;border:1px solid #2a2a3a;border-radius:10px;padding:14px;text-align:left;">
+        <div style="font-size:20px;margin-bottom:6px;">🥇</div>
+        <div style="font-size:14px;font-weight:700;color:#f0f0f5;margin-bottom:4px;">골드(금)</div>
+        <div style="font-size:11px;color:#f0a040;margin-bottom:6px;">변동성 지수: GVZ (CBOE)</div>
+        <div style="font-size:12px;color:#555;">입력: <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">골드 콜</code> <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">금 풋</code></div>
+      </div>
+      <div style="background:#1a1a24;border:1px solid #2a2a3a;border-radius:10px;padding:14px;text-align:left;">
+        <div style="font-size:20px;margin-bottom:6px;">📊</div>
+        <div style="font-size:14px;font-weight:700;color:#f0f0f5;margin-bottom:4px;">10년 국채</div>
+        <div style="font-size:11px;color:#f0a040;margin-bottom:6px;">변동성 지수: MOVE (ICE)</div>
+        <div style="font-size:12px;color:#555;">입력: <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">국채 콜</code> <code style="color:#f0a040;background:rgba(240,160,64,.08);border-radius:3px;padding:1px 5px;">국채 풋</code></div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:#444;line-height:1.7;">📡 데이터 출처: Yahoo Finance (CBOE·ICE 공식 지수) · 약 15~20분 지연<br>📌 교육 목적 자료 · 실제 투자 결정에 단독 활용 금지</p>
   </div>
   <div class="loading" id="ld"><div class="spinner"></div><div style="color:#707080;font-size:13px;" id="ldmsg">분석 중...</div></div>
   <div class="dash" id="dash"></div>
