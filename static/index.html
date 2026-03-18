@@ -198,8 +198,8 @@ function render(d,optType){
     <div class="two-col">
       <div class="card"><div class="card-title">고평가 요인 분석</div><div style="display:flex;flex-direction:column;gap:10px;">${fbars}</div></div>
       <div class="card">
-        <div class="card-title">원유 시장 불안도 (OVX) 추이</div>
-        <div class="ovx-explain"><b>OVX(원유 변동성 지수)</b>란? 원유 시장이 얼마나 불안하고 출렁이는지를 숫자로 나타낸 지표입니다.<br>📌 <b>숫자가 높을수록</b> 시장이 불안하고 → 옵션 가격이 비싸집니다.<br>📌 <b>숫자가 낮을수록</b> 시장이 안정적이고 → 옵션 가격이 저렴해집니다.</div>
+        <div class="card-title" id="volChartTitle">시장 변동성 추이</div>
+        <div class="ovx-explain" id="volExplain"></div>
         <div class="ovx-bar-area">${ovxBarDivs}</div>
         <div class="ovx-labels">${ovxLabelDivs}</div>
       </div>
