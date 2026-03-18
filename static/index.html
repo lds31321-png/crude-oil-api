@@ -525,7 +525,7 @@ function render(d) {
 
   /* OVX history chart (line) */
   const hist    = d.ovx_history || [];
-  const hDates  = hist.map(h => h.date.slice(5));   // MM-DD
+  const hDates  = hist.map(h => h.label);   // MM-DD
   const hVals   = hist.map(h => h.value);
   const avg     = hVals.length ? hVals.reduce((a,b)=>a+b,0)/hVals.length : 0;
   const step    = Math.ceil(hDates.length / 9);
