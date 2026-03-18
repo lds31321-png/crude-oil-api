@@ -117,7 +117,7 @@ ASSETS = {
     "유로": {
         "ticker": "EURUSD=X",
         "vol_ticker": None,
-        "iv_etf": "FXE",
+        "iv_etf": None,
         "name": "EUR/USD",
         "unit": "",
         "emoji": "🇪🇺",
@@ -125,7 +125,7 @@ ASSETS = {
     "euro": {
         "ticker": "EURUSD=X",
         "vol_ticker": None,
-        "iv_etf": "FXE",
+        "iv_etf": None,
         "name": "EUR/USD",
         "unit": "",
         "emoji": "🇪🇺",
@@ -133,7 +133,7 @@ ASSETS = {
     "엔화": {
         "ticker": "JPY=X",
         "vol_ticker": None,
-        "iv_etf": "FXY",
+        "iv_etf": None,
         "name": "USD/JPY",
         "unit": "",
         "emoji": "🇯🇵",
@@ -141,7 +141,7 @@ ASSETS = {
     "엔": {
         "ticker": "JPY=X",
         "vol_ticker": None,
-        "iv_etf": "FXY",
+        "iv_etf": None,
         "name": "USD/JPY",
         "unit": "",
         "emoji": "🇯🇵",
