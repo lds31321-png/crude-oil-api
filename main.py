@@ -114,21 +114,37 @@ ASSETS = {
         "unit": "$",
         "emoji": "🫘",
     },
-    "호주달러": {
-        "ticker": "AUDUSD=X",
+    "유로": {
+        "ticker": "EURUSD=X",
         "vol_ticker": None,
-        "iv_etf": None,
-        "name": "AUD/USD",
+        "iv_etf": "FXE",
+        "name": "EUR/USD",
         "unit": "",
-        "emoji": "🇦🇺",
+        "emoji": "🇪🇺",
     },
-    "aud": {
-        "ticker": "AUDUSD=X",
+    "euro": {
+        "ticker": "EURUSD=X",
         "vol_ticker": None,
-        "iv_etf": None,
-        "name": "AUD/USD",
+        "iv_etf": "FXE",
+        "name": "EUR/USD",
         "unit": "",
-        "emoji": "🇦🇺",
+        "emoji": "🇪🇺",
+    },
+    "엔화": {
+        "ticker": "JPY=X",
+        "vol_ticker": None,
+        "iv_etf": "FXY",
+        "name": "USD/JPY",
+        "unit": "",
+        "emoji": "🇯🇵",
+    },
+    "엔": {
+        "ticker": "JPY=X",
+        "vol_ticker": None,
+        "iv_etf": "FXY",
+        "name": "USD/JPY",
+        "unit": "",
+        "emoji": "🇯🇵",
     },
     "국채": {
         "ticker": "ZN=F",
@@ -152,7 +168,7 @@ ASSETS = {
 def find_asset(asset_str: str):
     s = asset_str.strip().lower()
     # 긴 키워드 먼저 매칭 (우선순위)
-    priority = ["천연가스","호주달러","크루드","지수","sp500","s&p500","s&p","crude","골드","대두","국채","10년","wti","원유","금","sp","aud"]
+    priority = ["천연가스","엔화","유로","크루드","지수","sp500","s&p500","s&p","crude","골드","대두","국채","10년","wti","원유","금","sp","euro","yen","엔"]
     for key in priority:
         if key in s:
             if key in ASSETS:
