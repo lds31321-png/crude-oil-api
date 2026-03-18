@@ -106,8 +106,9 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
 .hs-neutral .hs-badge{color:var(--amber);border-color:rgba(232,150,10,.4);background:rgba(232,150,10,.1);}
 .hs-buy .hs-badge{color:var(--green);border-color:rgba(24,160,96,.4);background:rgba(24,160,96,.1);}
 .hs-score-wrap{margin-top:10px;text-align:right;}
-.hs-score-num{font-family:var(--fm);font-size:42px;font-weight:700;line-height:1;}
-.hs-score-sub{font-family:var(--fc);font-size:10px;color:var(--t3);margin-top:2px;letter-spacing:.5px;}
+.hs-gauge-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-right:20px;border-right:1px solid rgba(255,255,255,.08);margin-right:20px;}
+.hs-score-num{font-family:var(--fm);font-size:44px;font-weight:700;line-height:1;text-align:center;}
+.hs-score-sub{font-family:var(--fc);font-size:10px;color:var(--t3);letter-spacing:.5px;text-align:center;margin-top:2px;}
 .hs-disclaimer{padding:6px 18px 10px;font-family:var(--fb);font-size:10px;color:var(--t3);border-top:1px solid var(--ln);background:var(--bg1);}
 
 /* ── KPI BAR ── */
@@ -417,104 +418,97 @@ function render(d,optType){
     return`<div class="ovx-pt"><div class="ovx-pt-val" style="color:${col}">${o.value}</div><div class="ovx-pt-lv" style="color:${col}">${ovxLevel(o.value)}</div>${evt.map(e=>`<div class="ovx-pt-ev">${e}</div>`).join("")}</div>`;
   }).join("");
 
+  // gauge arc SVG
+  const r=52,cx=66,cy=66,sa=-Math.PI,ea=0;
+  const fe=sa+(ea-sa)*(sc/100);
+  const gx1=cx+r*Math.cos(sa),gy1=cy+r*Math.sin(sa);
+  const gcfx=cx+r*Math.cos(fe),gcfy=cy+r*Math.sin(fe);
+  const glg=(fe-sa)>Math.PI?1:0;
+  const gx2=cx+r*Math.cos(ea),gy2=cy+r*Math.sin(ea);
+  const gticks=[25,50,75].map(p=>{
+    const ang=sa+(ea-sa)*(p/100),ri=r+4,ro=r+10;
+    return`<line x1="${(cx+ri*Math.cos(ang)).toFixed(1)}" y1="${(cy+ri*Math.sin(ang)).toFixed(1)}" x2="${(cx+ro*Math.cos(ang)).toFixed(1)}" y2="${(cy+ro*Math.sin(ang)).toFixed(1)}" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>`;
+  }).join('');
+
   document.getElementById("dash").innerHTML=`
-  <!-- HERO SIGNAL -->
+  <!-- ① 시그널 박스 — 게이지 왼쪽, 시그널 오른쪽 -->
   <div class="sec hero">
     <div class="hero-signal ${sig.cls}">
-      <div class="hs-left">
+      <!-- 게이지 + 점수 (왼쪽) -->
+      <div class="hs-gauge-wrap">
+        <svg width="132" height="76" viewBox="0 0 132 76">
+          <path d="M${gx1.toFixed(1)},${gy1.toFixed(1)} A${r},${r} 0 0 1 ${gx2.toFixed(1)},${gy2.toFixed(1)}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10" stroke-linecap="butt"/>
+          ${gticks}
+          <path d="M${gx1.toFixed(1)},${gy1.toFixed(1)} A${r},${r} 0 ${glg} 1 ${gcfx.toFixed(1)},${gcfy.toFixed(1)}" fill="none" stroke="${scCol}" stroke-width="10" stroke-linecap="butt"/>
+        </svg>
+        <div class="hs-score-num" style="color:${scCol};margin-top:-8px">${sc}</div>
+        <div class="hs-score-sub">/ 100점</div>
+        <div style="margin-top:6px;font-family:var(--fm);font-size:10px;font-weight:700;padding:2px 10px;border-radius:2px;border:1px solid ${scCol}40;color:${scCol};background:${scCol}18;display:inline-block;letter-spacing:.3px">● ${verdict}</div>
+      </div>
+      <!-- 시그널 텍스트 (오른쪽) -->
+      <div class="hs-left" style="flex:1">
         <div class="hs-verdict">${sig.cls==="hs-sell"?"🔴 고평가":sig.cls==="hs-neutral"?"🟡 적정":"🟢 저평가"} &nbsp;·&nbsp; ${d.asset_name||'원유'} ${d.option_type||optType} 옵션</div>
         <div class="hs-title">${sig.title}</div>
         <div class="hs-items">${sigItemsHtml}</div>
       </div>
-      <div class="hs-right">
+      <!-- 배지 (맨 오른쪽) -->
+      <div style="flex-shrink:0;align-self:flex-start">
         <div class="hs-badge">${sig.badge}</div>
-        <div class="hs-score-wrap">
-          <div class="hs-score-num" style="color:${scCol}">${sc}</div>
-          <div class="hs-score-sub">고평가 점수 / 100</div>
-          <div style="margin-top:6px;font-family:var(--fm);font-size:11px;font-weight:700;padding:3px 10px;border-radius:2px;border:1px solid ${scCol}33;color:${scCol};background:${scCol}18;display:inline-block">● ${verdict} 구간</div>
-        </div>
       </div>
     </div>
     <div class="hs-disclaimer">⚠ 본 분석은 변동성 지표 기반 교육 목적 자료입니다. 실제 매매 결정은 추가적인 기술적·기본적 분석과 본인의 판단에 따라야 합니다. · ${d.updated_at||''}</div>
   </div>
 
-  <!-- ALERT STRIP -->
+  <!-- ② 경고 스트립 -->
   <div class="alert-strip">
     <div class="alert-strip-head">⚠ 분석 주의사항</div>
     <div class="alert-strip-body">${d.alert_message}</div>
   </div>
 
-  <!-- KPI BAR -->
+  <!-- ③ KPI 6개 가로 바 -->
   <div class="sh"><span class="sh-title">핵심 지표</span><span class="sh-note">${volTicker} ${volCur} · HV ${hv}</span></div>
   <div class="kpi-bar">
-    <div class="kpi">
-      <div class="kpi-label">선물 IVR</div>
-      <div class="kpi-val" style="color:${ivRank>=70?'#e03030':ivRank>=40?'#e8960a':'#18a060'}">${d.iv_rank}</div>
-      <div class="kpi-tag tag-r">IV Rank (0~100)</div>
-      <div class="kpi-interp">${ivRankInterp}</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">IV 백분위</div>
-      <div class="kpi-val" style="color:${parseFloat(ivPct)>=70?'#e03030':'#e8960a'}">${ivPct}</div>
-      <div class="kpi-tag tag-r">1년 기준</div>
-      <div class="kpi-interp">${ivPctInterp}</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">IV 방향성</div>
-      <div class="kpi-val" style="font-size:16px;color:${ivDir==='상승'?'#e03030':ivDir==='하락'?'#18a060':'#6878a0'}">${d.iv_direction}</div>
-      <div class="kpi-tag ${ivDirCls}">${ivDir==="상승"?"▲ 확대":ivDir==="하락"?"▼ 축소":"→ 횡보"}</div>
-      <div class="kpi-interp">${ivDirInterp}</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">HV 대비 프리미엄</div>
-      <div class="kpi-val" style="color:${hv_premium>0?'#e03030':'#18a060'}">+${hv_premium}%</div>
-      <div class="kpi-tag tag-a">IV − HV 차이</div>
-      <div class="kpi-interp">${hvInterp}</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">IV / HV 배율</div>
-      <div class="kpi-val" style="color:${iv_hv_ratio>=1.3?'#e03030':'#e8960a'}">${iv_hv_ratio}×</div>
-      <div class="kpi-tag tag-r">실제 변동성 대비</div>
-      <div class="kpi-interp">${ratioInterp}</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">콜 / 풋 비율</div>
-      <div class="kpi-val" style="color:${cpNum>1.5?'#e03030':cpNum<0.7?'#18a060':'#6878a0'}">${d.call_put_ratio}</div>
-      <div class="kpi-tag tag-m">C/P 거래량</div>
-      <div class="kpi-interp">${cpInterp}</div>
-    </div>
+    <div class="kpi"><div class="kpi-label">선물 IVR</div><div class="kpi-val" style="color:${ivRank>=70?'#e03030':ivRank>=40?'#e8960a':'#18a060'}">${d.iv_rank}</div><div class="kpi-tag tag-r">IV Rank (0~100)</div><div class="kpi-interp">${ivRankInterp}</div></div>
+    <div class="kpi"><div class="kpi-label">IV 백분위</div><div class="kpi-val" style="color:${parseFloat(ivPct)>=70?'#e03030':'#e8960a'}">${ivPct}</div><div class="kpi-tag tag-r">1년 기준</div><div class="kpi-interp">${ivPctInterp}</div></div>
+    <div class="kpi"><div class="kpi-label">IV 방향성</div><div class="kpi-val" style="font-size:16px;color:${ivDir==='상승'?'#e03030':ivDir==='하락'?'#18a060':'#6878a0'}">${d.iv_direction}</div><div class="kpi-tag ${ivDirCls}">${ivDir==="상승"?"▲ 확대":ivDir==="하락"?"▼ 축소":"→ 횡보"}</div><div class="kpi-interp">${ivDirInterp}</div></div>
+    <div class="kpi"><div class="kpi-label">HV 대비 프리미엄</div><div class="kpi-val" style="color:${hv_premium>0?'#e03030':'#18a060'}">+${hv_premium}%</div><div class="kpi-tag tag-a">IV − HV 차이</div><div class="kpi-interp">${hvInterp}</div></div>
+    <div class="kpi"><div class="kpi-label">IV / HV 배율</div><div class="kpi-val" style="color:${iv_hv_ratio>=1.3?'#e03030':'#e8960a'}">${iv_hv_ratio}×</div><div class="kpi-tag tag-r">실제 변동성 대비</div><div class="kpi-interp">${ratioInterp}</div></div>
+    <div class="kpi"><div class="kpi-label">콜 / 풋 비율</div><div class="kpi-val" style="color:${cpNum>1.5?'#e03030':cpNum<0.7?'#18a060':'#6878a0'}">${d.call_put_ratio}</div><div class="kpi-tag tag-m">C/P 거래량</div><div class="kpi-interp">${cpInterp}</div></div>
   </div>
 
-  <!-- CHART ROW -->
-  <div class="sh" style="border-top:1px solid var(--ln)"><span class="sh-title">변동성 분석</span></div>
-  <div class="chart-row">
-    <div class="chart-col">
-      <div class="chart-head">
-        <span class="chart-title">IV vs HV 비교 분석</span>
-        <span class="chart-val" style="color:${diffCol}">${diffSign}${hv_premium}pt</span>
+  <!-- ④ IV vs HV — 단독 전체 너비 -->
+  <div class="sh" style="border-top:1px solid var(--ln)"><span class="sh-title">IV vs HV 비교 분석</span><span class="sh-note" style="color:${diffCol}">${diffSign}${hv_premium}pt 프리미엄</span></div>
+  <div style="padding:16px 18px;border-bottom:1px solid var(--ln);">
+    <div class="ivhv-rows">
+      <div class="ivhv-row">
+        <div class="ivhv-meta"><span class="ivhv-name">${volTicker} &nbsp;내재변동성 (IV)</span><span class="ivhv-num" style="color:#e03030">${volCur}</span></div>
+        <div class="ivhv-track"><div class="ivhv-fill" style="width:${ivW}%;background:linear-gradient(90deg,#801818,#e03030)"></div></div>
       </div>
-      <div class="ivhv-rows">
-        <div class="ivhv-row">
-          <div class="ivhv-meta"><span class="ivhv-name">${volTicker} &nbsp;내재변동성</span><span class="ivhv-num" style="color:#e03030">${volCur}</span></div>
-          <div class="ivhv-track"><div class="ivhv-fill" style="width:${ivW}%;background:linear-gradient(90deg,#801818,#e03030)"></div></div>
-        </div>
-        <div class="ivhv-row">
-          <div class="ivhv-meta"><span class="ivhv-name">HV &nbsp;역사적 변동성</span><span class="ivhv-num" style="color:#2478c8">${hv}</span></div>
-          <div class="ivhv-track"><div class="ivhv-fill" style="width:${hvW}%;background:linear-gradient(90deg,#103878,#2478c8)"></div></div>
-        </div>
+      <div class="ivhv-row">
+        <div class="ivhv-meta"><span class="ivhv-name">HV &nbsp;역사적 변동성</span><span class="ivhv-num" style="color:#2478c8">${hv}</span></div>
+        <div class="ivhv-track"><div class="ivhv-fill" style="width:${hvW}%;background:linear-gradient(90deg,#103878,#2478c8)"></div></div>
       </div>
-      <div class="ivhv-diff-row">
-        <span class="ivhv-diff-lbl">프리미엄 차이 (IV − HV)</span>
-        <span class="ivhv-diff-val" style="color:${diffCol}">${diffSign}${hv_premium}pt</span>
-      </div>
-      <div class="ivhv-interp">${ivHvInterpText}</div>
     </div>
-    <div class="chart-col">
+    <div class="ivhv-diff-row">
+      <span class="ivhv-diff-lbl">프리미엄 차이 (IV − HV)</span>
+      <span class="ivhv-diff-val" style="color:${diffCol}">${diffSign}${hv_premium}pt</span>
+    </div>
+    <div class="ivhv-interp">${ivHvInterpText}</div>
+  </div>
+
+  <!-- ⑤ 고평가 요인(좌) + OVX 차트(우) -->
+  <div class="sh" style="border-top:0"><span class="sh-title">요인 분석 · 변동성 히스토리</span></div>
+  <div class="bottom-row">
+    <div class="bottom-col">
+      <div class="chart-title" style="margin-bottom:14px">고평가 요인 분석</div>
+      <table class="factor-table">${fbarRows}</table>
+    </div>
+    <div class="bottom-col">
       <div class="chart-head">
         <span class="chart-title">변동성 지수 히스토리</span>
         <span class="chart-val" style="color:${volCol}">${volTicker} ${curOvxV}</span>
       </div>
-      <div class="ovx-canvas-wrap">
+      <div class="ovx-canvas-wrap" style="height:110px;">
         <canvas class="ovx-canvas" id="ovxCanvas"></canvas>
       </div>
       <div class="ovx-points">${ovxPtDivs}</div>
@@ -525,19 +519,10 @@ function render(d,optType){
     </div>
   </div>
 
-  <!-- BOTTOM ROW -->
-  <div class="sh" style="border-top:1px solid var(--ln)"><span class="sh-title">요인 분석</span></div>
-  <div class="bottom-row">
-    <div class="bottom-col">
-      <div class="chart-title" style="margin-bottom:12px">고평가 요인 분석</div>
-      <table class="factor-table">
-        ${fbarRows}
-      </table>
-    </div>
-    <div class="bottom-col">
-      <div class="chart-title" style="margin-bottom:12px">분석 요약</div>
-      ${(d.commentary||[]).map(p=>`<p class="comm-p">${p}</p>`).join("")}
-    </div>
+  <!-- ⑥ 분석 요약 — 하단 -->
+  <div class="sh" style="border-top:1px solid var(--ln)"><span class="sh-title">분석 요약</span></div>
+  <div style="padding:16px 18px;">
+    ${(d.commentary||[]).map(p=>`<p class="comm-p">${p}</p>`).join("")}
   </div>`;
 
   document.getElementById("dash").classList.add("on");
