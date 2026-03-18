@@ -101,7 +101,7 @@ ASSETS = {
     "천연가스": {
         "ticker": "NG=F",
         "vol_ticker": None,
-        "iv_etf": "UNG",
+        "iv_etf": None,
         "name": "천연가스",
         "unit": "$",
         "emoji": "⛽",
