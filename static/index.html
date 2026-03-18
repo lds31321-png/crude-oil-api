@@ -112,7 +112,9 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
 .hs-disclaimer{padding:6px 18px 10px;font-family:var(--fb);font-size:10px;color:var(--t3);border-top:1px solid var(--ln);background:var(--bg1);}
 
 /* ── KPI BAR ── */
-.kpi-bar{display:grid;grid-template-columns:repeat(6,1fr);background:var(--bg1);}
+.kpi-bar{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg1);}
+.kpi-bar .kpi:nth-child(3){border-right:none;}
+.kpi-bar .kpi:nth-child(n+4){border-top:1px solid var(--ln);}
 .kpi{padding:10px 14px;border-right:1px solid var(--ln);position:relative;}
 .kpi:last-child{border-right:none;}
 .kpi-label{font-family:var(--fc);font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;}
@@ -496,26 +498,22 @@ function render(d,optType){
     <div class="ivhv-interp">${ivHvInterpText}</div>
   </div>
 
-  <!-- ⑤ 고평가 요인(좌) + OVX 차트(우) -->
-  <div class="sh" style="border-top:0"><span class="sh-title">요인 분석 · 변동성 히스토리</span></div>
-  <div class="bottom-row">
-    <div class="bottom-col">
-      <div class="chart-title" style="margin-bottom:14px">고평가 요인 분석</div>
-      <table class="factor-table">${fbarRows}</table>
+  <!-- ⑤ 고평가 요인 분석 — 전체 너비 -->
+  <div class="sh" style="border-top:0"><span class="sh-title">고평가 요인 분석</span></div>
+  <div style="padding:16px 18px;border-bottom:1px solid var(--ln);">
+    <table class="factor-table">${fbarRows}</table>
+  </div>
+
+  <!-- ⑥ 변동성 지수 히스토리 — 별도 섹션 하단 -->
+  <div class="sh"><span class="sh-title">변동성 지수 히스토리</span><span class="sh-note" style="color:${volCol}">${volTicker} ${curOvxV}</span></div>
+  <div style="padding:16px 18px;border-bottom:1px solid var(--ln);">
+    <div class="ovx-canvas-wrap" style="height:120px;">
+      <canvas class="ovx-canvas" id="ovxCanvas"></canvas>
     </div>
-    <div class="bottom-col">
-      <div class="chart-head">
-        <span class="chart-title">변동성 지수 히스토리</span>
-        <span class="chart-val" style="color:${volCol}">${volTicker} ${curOvxV}</span>
-      </div>
-      <div class="ovx-canvas-wrap" style="height:110px;">
-        <canvas class="ovx-canvas" id="ovxCanvas"></canvas>
-      </div>
-      <div class="ovx-points">${ovxPtDivs}</div>
-      <div class="ovx-context">
-        <div class="ovx-context-title">📌 히스토리 맥락 해석</div>
-        <div class="ovx-context-text">${ovxCtx}</div>
-      </div>
+    <div class="ovx-points" style="margin-top:8px;">${ovxPtDivs}</div>
+    <div class="ovx-context" style="margin-top:12px;">
+      <div class="ovx-context-title">📌 히스토리 맥락 해석</div>
+      <div class="ovx-context-text">${ovxCtx}</div>
     </div>
   </div>
 
