@@ -111,9 +111,12 @@ ASSETS = {
 
 def find_asset(asset_str: str):
     s = asset_str.strip().lower()
-    for key, val in ASSETS.items():
+    # 긴 키워드 먼저 매칭 (우선순위)
+    priority = ["천연가스","호주달러","크루드","지수","sp500","s&p","crude","골드","대두","국채","10년","wti","원유","금","sp","aud"]
+    for key in priority:
         if key in s:
-            return key, val
+            if key in ASSETS:
+                return key, ASSETS[key]
     return "원유", ASSETS["원유"]
 
 
