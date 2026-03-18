@@ -408,7 +408,7 @@ function render(d) {
     <div class="si"><span>5일 수익률</span><b class="${retCls(r5)}">${sgn(r5.toFixed(2))}%</b></div>
     <div class="si"><span>20일 수익률</span><b class="${retCls(r20)}">${sgn(r20.toFixed(2))}%</b></div>
     <div class="si"><span>OVX</span><b>${d.ovx_current}</b></div>
-    <div class="si"><span>52주 범위</span><b>${d.ovx_52w_lo} – ${d.ovx_52w_hi}</b></div>
+    <div class="si"><span>52주 범위</span><b>${"-"} – ${"-"}</b></div>
     <div class="strip-ts">📡 ${d.data_source || ''} &nbsp;·&nbsp; 🕐 ${d.updated_at || ''}</div>`;
 
   /* gauge */
