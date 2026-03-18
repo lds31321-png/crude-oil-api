@@ -35,7 +35,8 @@ html,body{height:100%;}
 body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;line-height:1.4;}
 
 /* ── TOPBAR ── */
-.tb{height:44px;background:var(--bg1);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100;}
+.tb{height:44px;background:var(--bg1);border-bottom:1px solid var(--ln);display:flex;justify-content:center;position:sticky;top:0;z-index:100;}
+.tb-inner{width:100%;max-width:1280px;display:flex;align-items:center;padding:0 18px;gap:12px;}
 .tb-brand{font-family:var(--fx);font-size:13px;font-weight:800;color:var(--amber);letter-spacing:1.2px;display:flex;align-items:center;gap:7px;}
 .tb-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:blink 2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -51,7 +52,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
 .tb-btn:disabled{background:var(--bg3);color:var(--t3);cursor:not-allowed;}
 
 /* ── MAIN ── */
-.main{padding:0;}
+.main{padding:0;background:var(--bg);display:flex;justify-content:center;}
+.main-inner{width:100%;max-width:1280px;border-left:1px solid var(--ln);border-right:1px solid var(--ln);}
 
 /* ── PLACEHOLDER ── */
 .ph{padding:40px 20px;max-width:640px;margin:0 auto;}
@@ -199,6 +201,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
 
 <!-- TOPBAR -->
 <div class="tb">
+<div class="tb-inner">
   <div class="tb-brand"><div class="tb-dot"></div>OPX ANALYZER</div>
   <div class="tb-live">LIVE</div>
   <div class="tb-div"></div>
@@ -207,8 +210,10 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
     <button class="tb-btn" id="btn" onclick="run()">분석 실행</button>
   </div>
 </div>
+</div>
 
 <div class="main">
+<div class="main-inner">
 
   <!-- PLACEHOLDER -->
   <div class="ph" id="ph">
@@ -229,7 +234,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fc);font-size:13px;l
   <!-- DASHBOARD -->
   <div class="dash" id="dash"></div>
 
-</div>
+</div><!-- /main-inner -->
+</div><!-- /main -->
 
 <script>
 const EVENTS={"23Q2":"SVB 파산\n신용위기","23Q4":"중동\n분쟁 격화","24Q2":"이란·이스라엘\n충돌","24Q4":"미국\n대선","현재":"관세전쟁\n무역분쟁"};
