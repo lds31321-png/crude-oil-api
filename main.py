@@ -14,6 +14,96 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
+# ── 종목 설정 ──────────────────────────────────────────
+ASSETS = {
+    "원유": {
+        "ticker": "CL=F",
+        "vol_ticker": "^OVX",
+        "name": "WTI 원유",
+        "unit": "$",
+        "emoji": "🛢",
+    },
+    "S&P": {
+        "ticker": "ES=F",
+        "vol_ticker": "^VIX",
+        "name": "S&P500",
+        "unit": "$",
+        "emoji": "📈",
+    },
+    "sp": {
+        "ticker": "ES=F",
+        "vol_ticker": "^VIX",
+        "name": "S&P500",
+        "unit": "$",
+        "emoji": "📈",
+    },
+    "골드": {
+        "ticker": "GC=F",
+        "vol_ticker": "^GVZ",
+        "name": "골드",
+        "unit": "$",
+        "emoji": "🥇",
+    },
+    "금": {
+        "ticker": "GC=F",
+        "vol_ticker": "^GVZ",
+        "name": "골드",
+        "unit": "$",
+        "emoji": "🥇",
+    },
+    "천연가스": {
+        "ticker": "NG=F",
+        "vol_ticker": "^OVX",
+        "name": "천연가스",
+        "unit": "$",
+        "emoji": "⛽",
+    },
+    "대두": {
+        "ticker": "ZS=F",
+        "vol_ticker": "^OVX",
+        "name": "대두",
+        "unit": "$",
+        "emoji": "🫘",
+    },
+    "호주달러": {
+        "ticker": "AUDUSD=X",
+        "vol_ticker": "^OVX",
+        "name": "AUD/USD",
+        "unit": "",
+        "emoji": "🇦🇺",
+    },
+    "aud": {
+        "ticker": "AUDUSD=X",
+        "vol_ticker": "^OVX",
+        "name": "AUD/USD",
+        "unit": "",
+        "emoji": "🇦🇺",
+    },
+    "국채": {
+        "ticker": "ZN=F",
+        "vol_ticker": "^MOVE",
+        "name": "10년 국채",
+        "unit": "$",
+        "emoji": "📊",
+    },
+    "10년": {
+        "ticker": "ZN=F",
+        "vol_ticker": "^MOVE",
+        "name": "10년 국채",
+        "unit": "$",
+        "emoji": "📊",
+    },
+}
+
+
+def find_asset(asset_str: str):
+    """입력 문자열에서 자산 찾기"""
+    s = asset_str.strip().lower()
+    for key, val in ASSETS.items():
+        if key in s:
+            return key, val
+    return "원유", ASSETS["원유"]  # 기본값
+
 
 def calc_hv(prices, window=30):
     log_ret = np.log(prices / prices.shift(1)).dropna()
@@ -33,9 +123,9 @@ def get_direction(series):
     return "상승" if slope > 0.2 else ("하락" if slope < -0.2 else "횡보")
 
 
-def get_cp_ratio():
+def get_cp_ratio(ticker):
     try:
-        t = yf.Ticker("CL=F")
+        t = yf.Ticker(ticker)
         exps = t.options
         if not exps:
             return 1.0
@@ -47,13 +137,11 @@ def get_cp_ratio():
         return 1.0
 
 
-def ovx_5points(df):
-    """OVX 역사적 5개 포인트 - 타임존 문제 수정"""
-    # 타임존 제거
+def ovx_5points(df, asset_name):
+    """역사적 5개 포인트"""
     if hasattr(df.index, "tz") and df.index.tz is not None:
         df = df.copy()
         df.index = df.index.tz_localize(None)
-
     points = [
         ("21Q4", "2021-11-15"),
         ("22Q2", "2022-05-10"),
@@ -64,59 +152,41 @@ def ovx_5points(df):
     for label, date in points:
         try:
             ts = pd.Timestamp(date)
-            # 해당 날짜에 가장 가까운 인덱스 찾기
-            idx = df.index.searchsorted(ts)
-            idx = min(idx, len(df) - 1)
+            idx = min(df.index.searchsorted(ts), len(df) - 1)
             val = round(float(df["Close"].iloc[idx]), 1)
-        except Exception:
+        except:
             val = 0.0
         result.append({"label": label, "value": val})
     result.append({"label": "현재", "value": round(float(df["Close"].iloc[-1]), 1)})
     return result
 
 
-def calc_score(
-    iv_rank, iv_pct, hv_premium, ratio, direction, cp, option_type, wti_ret5
-):
-    """
-    고평가 점수 계산 (매도자 관점)
-    - 기본 점수: IV가 높을수록, HV 대비 프리미엄이 클수록 고평가
-    - 콜 조정: WTI 상승 + CP비율 높을수록 콜 고평가
-    - 풋 조정: WTI 하락 + CP비율 낮을수록 풋 고평가
-    """
-    # 기본 고평가 점수 (IV vs HV 관점)
+def calc_score(iv_rank, iv_pct, hv_premium, ratio, direction, cp, option_type, ret5):
     s = iv_rank * 0.30 + iv_pct * 0.25
     s += min(max(hv_premium * 1.5, 0), 100) * 0.20
     s += min(max((ratio - 1.0) / 0.8 * 100, 0), 100) * 0.15
-
     if option_type == "콜":
-        # 콜: WTI 상승 중일수록 콜 수요 증가 → 콜 프리미엄 고평가
-        if wti_ret5 > 5:
-            s += 15  # WTI 강한 상승 → 콜 고평가
-        elif wti_ret5 > 2:
+        if ret5 > 5:
+            s += 15
+        elif ret5 > 2:
             s += 8
-        elif wti_ret5 < -2:
+        elif ret5 < -2:
             s -= 8
-        # CP비율 높을수록 콜 수요 강세 → 콜 고평가
         if cp > 1.5:
             s += 10
         elif cp > 1.2:
             s += 5
         elif cp < 0.8:
             s -= 10
-        # IV 상승 중이면 콜 프리미엄 더 비싸짐
         if direction == "상승":
             s += 5
-
-    else:  # 풋
-        # 풋: WTI 하락 중일수록 풋 수요 증가 → 풋 프리미엄 고평가
-        if wti_ret5 < -5:
-            s += 15  # WTI 강한 하락 → 풋 고평가
-        elif wti_ret5 < -2:
+    else:
+        if ret5 < -5:
+            s += 15
+        elif ret5 < -2:
             s += 8
-        elif wti_ret5 > 2:
+        elif ret5 > 2:
             s -= 8
-        # CP비율 낮을수록 풋 수요 강세 → 풋 고평가
         if cp < 0.7:
             s += 10
         elif cp < 0.85:
@@ -125,42 +195,28 @@ def calc_score(
             s -= 10
         if direction == "하락":
             s += 5
-
     return int(min(max(round(s), 0), 100))
 
 
-def calc_factors(iv_pct, hv_premium, ovx_cur, cp, iv_rank, option_type, wti_ret5):
-    """거시경제 요인 포함 고평가 요인 계산"""
+def calc_factors(iv_pct, hv_premium, vol_cur, cp, iv_rank, option_type, ret5):
     month = datetime.now().month
-
-    # 지정학 리스크: OVX 수준 기반
-    geo_risk = min(int(ovx_cur * 0.85), 100)
-
-    # 공급 불확실성: IV 백분위 기반
+    geo_risk = min(int(vol_cur * 0.85), 100)
     supply_unc = min(int(iv_pct * 0.9), 100)
-
-    # 계절적 수요: 드라이빙 시즌(5~8월), 겨난(11~2월) 높음
     if month in [5, 6, 7, 8]:
         seasonal = 75
     elif month in [11, 12, 1, 2]:
         seasonal = 70
     else:
         seasonal = 55
-
-    # 달러 강세 압력: IVR 기반
     dollar = min(int(iv_rank * 0.72), 100)
-
-    # 투기 포지션: 옵션 종류별 CP비율 반영
     if option_type == "콜":
         spec = min(int(cp * 50), 100)
-        # WTI 상승 시 투기 콜 포지션 증가
-        if wti_ret5 > 3:
+        if ret5 > 3:
             spec = min(spec + 15, 100)
     else:
         spec = min(int((2.0 - min(cp, 2.0)) * 50), 100)
-        if wti_ret5 < -3:
+        if ret5 < -3:
             spec = min(spec + 15, 100)
-
     return [
         {"name": "지정학 리스크", "pct": geo_risk},
         {"name": "공급 불확실성", "pct": supply_unc},
@@ -171,56 +227,66 @@ def calc_factors(iv_pct, hv_premium, ovx_cur, cp, iv_rank, option_type, wti_ret5
 
 
 @app.get("/analyze")
-async def analyze(option_type: str = "콜"):
+async def analyze(option_type: str = "콜", asset: str = "원유"):
     try:
-        ovx_df = yf.Ticker("^OVX").history(period="5y")
-        ovx_1y = ovx_df["Close"].iloc[-252:]
-        ovx_cur = round(float(ovx_df["Close"].iloc[-1]), 2)
+        # 자산 찾기
+        asset_key, asset_info = find_asset(asset)
+        ticker = asset_info["ticker"]
+        vol_ticker = asset_info["vol_ticker"]
+        asset_name = asset_info["name"]
+        emoji = asset_info["emoji"]
 
-        wti_df = yf.Ticker("CL=F").history(period="1y")
-        wti_cur = round(float(wti_df["Close"].iloc[-1]), 2)
+        # 변동성 지수 데이터
+        vol_df = yf.Ticker(vol_ticker).history(period="5y")
+        vol_1y = vol_df["Close"].iloc[-252:]
+        vol_cur = round(float(vol_df["Close"].iloc[-1]), 2)
 
-        # WTI 5일/20일 수익률
-        wti_ret5 = (
-            round((wti_df["Close"].iloc[-1] / wti_df["Close"].iloc[-6] - 1) * 100, 2)
-            if len(wti_df) > 6
+        # 기초자산 데이터
+        price_df = yf.Ticker(ticker).history(period="1y")
+        price_cur = round(float(price_df["Close"].iloc[-1]), 2)
+        ret5 = (
+            round(
+                (price_df["Close"].iloc[-1] / price_df["Close"].iloc[-6] - 1) * 100, 2
+            )
+            if len(price_df) > 6
             else 0.0
         )
-        wti_ret20 = (
-            round((wti_df["Close"].iloc[-1] / wti_df["Close"].iloc[-22] - 1) * 100, 2)
-            if len(wti_df) > 22
+        ret20 = (
+            round(
+                (price_df["Close"].iloc[-1] / price_df["Close"].iloc[-22] - 1) * 100, 2
+            )
+            if len(price_df) > 22
             else 0.0
         )
 
-        hv = calc_hv(wti_df["Close"])
-        iv_rank, iv_pct = calc_iv_rank(ovx_1y)
-        direction = get_direction(ovx_1y)
-        hv_premium = round(ovx_cur - hv, 2)
-        ratio = round(ovx_cur / hv, 2) if hv > 0 else 1.0
-        cp = get_cp_ratio()
+        hv = calc_hv(price_df["Close"])
+        iv_rank, iv_pct = calc_iv_rank(vol_1y)
+        direction = get_direction(vol_1y)
+        hv_premium = round(vol_cur - hv, 2)
+        ratio = round(vol_cur / hv, 2) if hv > 0 else 1.0
+        cp = get_cp_ratio(ticker)
 
         score = calc_score(
-            iv_rank, iv_pct, hv_premium, ratio, direction, cp, option_type, wti_ret5
+            iv_rank, iv_pct, hv_premium, ratio, direction, cp, option_type, ret5
         )
         verdict = "고평가" if score >= 70 else ("적정" if score >= 40 else "저평가")
         opt_label = (
             f"{option_type}(Call)" if option_type == "콜" else f"{option_type}(Put)"
         )
         factors = calc_factors(
-            iv_pct, hv_premium, ovx_cur, cp, iv_rank, option_type, wti_ret5
+            iv_pct, hv_premium, vol_cur, cp, iv_rank, option_type, ret5
         )
 
-        # 콜/풋별 분석 코멘터리
         if option_type == "콜":
             comm = [
-                f"현재 WTI 원유 선물 가격은 ${wti_cur}이며 5일 수익률 {wti_ret5:+.2f}%, OVX(원유 변동성 지수)는 {ovx_cur}입니다.",
-                f"내재변동성(IV) {ovx_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. WTI {'상승' if wti_ret5 > 0 else '하락'} 추세에서 콜 옵션 수요가 {'증가' if wti_ret5 > 2 else '보통'}하고 있습니다.",
+                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성 지수는 {vol_cur}입니다.",
+                f"내재변동성(IV) {vol_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. {'상승' if ret5 > 0 else '하락'} 추세에서 콜 옵션 수요가 {'증가' if ret5 > 2 else '보통'}하고 있습니다.",
                 f"IV Rank {iv_rank}, IV 백분위 {iv_pct}%로 {verdict} 수준입니다. 콜/풋 비율 {cp}로 {'콜 수요 우세' if cp > 1 else '풋 수요 우세'}한 상황이며 콜 프리미엄 고평가 점수는 {score}점입니다.",
             ]
         else:
             comm = [
-                f"현재 WTI 원유 선물 가격은 ${wti_cur}이며 5일 수익률 {wti_ret5:+.2f}%, OVX(원유 변동성 지수)는 {ovx_cur}입니다.",
-                f"내재변동성(IV) {ovx_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. WTI {'하락' if wti_ret5 < 0 else '상승'} 추세에서 풋 옵션 수요가 {'증가' if wti_ret5 < -2 else '보통'}하고 있습니다.",
+                f"현재 {asset_name} 가격은 {asset_info['unit']}{price_cur}이며 5일 수익률 {ret5:+.2f}%, 변동성 지수는 {vol_cur}입니다.",
+                f"내재변동성(IV) {vol_cur}이 역사적 변동성(HV) {hv} 대비 {hv_premium}포인트 프리미엄으로 거래되고 있습니다. {'하락' if ret5 < 0 else '상승'} 추세에서 풋 옵션 수요가 {'증가' if ret5 < -2 else '보통'}하고 있습니다.",
                 f"IV Rank {iv_rank}, IV 백분위 {iv_pct}%로 {verdict} 수준입니다. 콜/풋 비율 {cp}로 {'풋 수요 우세' if cp < 1 else '콜 수요 우세'}한 상황이며 풋 프리미엄 고평가 점수는 {score}점입니다.",
             ]
 
@@ -228,10 +294,14 @@ async def analyze(option_type: str = "콜"):
             "score": score,
             "verdict": verdict,
             "option_type": opt_label,
-            "wti_price": wti_cur,
-            "wti_ret5": wti_ret5,
-            "wti_ret20": wti_ret20,
-            "ovx_current": ovx_cur,
+            "asset_name": asset_name,
+            "emoji": emoji,
+            "price": price_cur,
+            "price_unit": asset_info["unit"],
+            "ret5": ret5,
+            "ret20": ret20,
+            "vol_current": vol_cur,
+            "vol_ticker": vol_ticker,
             "iv_rank": iv_rank,
             "iv_percentile": f"{iv_pct}%",
             "iv_direction": direction,
@@ -240,11 +310,11 @@ async def analyze(option_type: str = "콜"):
             "iv_hv_ratio": ratio,
             "call_put_ratio": cp,
             "factors": factors,
-            "ovx_history": ovx_5points(ovx_df),
-            "alert_message": f"현재 원유 {option_type} 옵션 IV({ovx_cur})가 HV({hv})보다 {hv_premium}포인트 높습니다. WTI 5일 수익률 {wti_ret5:+.2f}% 반영 시 {option_type} 프리미엄 고평가 점수 {score}점으로 {verdict} 구간입니다.",
-            "commentary_title": f"원유 {option_type}옵션 {verdict} 분석",
+            "ovx_history": ovx_5points(vol_df, asset_name),
+            "alert_message": f"현재 {asset_name} {option_type} 옵션 IV({vol_cur})가 HV({hv})보다 {hv_premium}포인트 높습니다. {option_type} 프리미엄 고평가 점수 {score}점으로 {verdict} 구간입니다.",
+            "commentary_title": f"{asset_name} {option_type}옵션 {verdict} 분석",
             "commentary": comm,
-            "data_source": "Yahoo Finance — 약 15분 지연 데이터",
+            "data_source": "Yahoo Finance — 약 15~20분 지연 데이터",
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M KST"),
         }
     except Exception as e:
