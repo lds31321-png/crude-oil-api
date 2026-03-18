@@ -109,7 +109,6 @@ async function run(){
   if(!isCall&&!isPut){alert('"원유 콜" 또는 "원유 풋"을 입력해주세요.');return;}
   const optType=isCall?"콜":"풋";
   const assetParam=encodeURIComponent(q.replace(/콜|풋|call|put/gi,'').trim()||'원유');
-  const assetParam=encodeURIComponent(q.replace(/콜|풋|call|put/gi,'').trim()||'원유');
   document.getElementById("ph").style.display="none";
   document.getElementById("dash").classList.remove("on");
   const ld=document.getElementById("ld");ld.classList.add("on");
