@@ -117,7 +117,7 @@ ASSETS = {
     "호주달러": {
         "ticker": "AUDUSD=X",
         "vol_ticker": None,
-        "iv_etf": "FXA",
+        "iv_etf": None,
         "name": "AUD/USD",
         "unit": "",
         "emoji": "🇦🇺",
@@ -125,7 +125,7 @@ ASSETS = {
     "aud": {
         "ticker": "AUDUSD=X",
         "vol_ticker": None,
-        "iv_etf": "FXA",
+        "iv_etf": None,
         "name": "AUD/USD",
         "unit": "",
         "emoji": "🇦🇺",
