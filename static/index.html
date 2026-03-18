@@ -8,351 +8,157 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-
 :root{
-  --bg0:#050910;
-  --bg1:#0a1018;
-  --bg2:#101820;
-  --bg3:#162030;
-  --bd1:rgba(255,255,255,.055);
-  --bd2:rgba(255,255,255,.1);
-  --bd3:rgba(255,255,255,.15);
-  --amber:#f0a030;
-  --amber2:rgba(240,160,48,.12);
-  --amber3:rgba(240,160,48,.06);
-  --red:#ff4438;
-  --red2:rgba(255,68,56,.09);
-  --green:#00c97a;
-  --green2:rgba(0,201,122,.09);
-  --t1:#cdd8e8;
-  --t2:#7a8fa8;
-  --t3:#3a5068;
-  --fx:'Oxanium',sans-serif;
-  --fm:'JetBrains Mono',monospace;
-  --fc:'Barlow Condensed',sans-serif;
-  --fb:'Barlow',sans-serif;
+  --bg0:#050910;--bg1:#0a1018;--bg2:#101820;--bg3:#162030;
+  --bd1:rgba(255,255,255,.055);--bd2:rgba(255,255,255,.1);
+  --amber:#f0a030;--amber2:rgba(240,160,48,.12);--amber3:rgba(240,160,48,.06);
+  --red:#ff4438;--red2:rgba(255,68,56,.09);
+  --green:#00c97a;--green2:rgba(0,201,122,.09);
+  --blue:#3a9fd8;--blue2:rgba(58,159,216,.1);
+  --t1:#cdd8e8;--t2:#7a8fa8;--t3:#3a5068;
+  --fx:'Oxanium',sans-serif;--fm:'JetBrains Mono',monospace;
+  --fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
+body{background:var(--bg0);color:var(--t1);font-family:var(--fc);font-size:14px;line-height:1.5;min-height:100vh;
+  background-image:linear-gradient(var(--bd1) 1px,transparent 1px),linear-gradient(90deg,var(--bd1) 1px,transparent 1px);
+  background-size:48px 48px;}
 
-body{
-  background:var(--bg0);
-  color:var(--t1);
-  font-family:var(--fc);
-  font-size:14px;
-  line-height:1.5;
-  min-height:100vh;
-  background-image:
-    linear-gradient(var(--bd1) 1px,transparent 1px),
-    linear-gradient(90deg,var(--bd1) 1px,transparent 1px);
-  background-size:48px 48px;
-}
-
-/* ── TOPBAR ── */
-.topbar{
-  background:rgba(7,11,18,.92);
-  border-bottom:1px solid var(--bd1);
-  padding:0 20px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  position:sticky;
-  top:0;
-  z-index:100;
-  backdrop-filter:blur(12px);
-}
-.brand{
-  font-family:var(--fx);
-  font-size:15px;
-  font-weight:800;
-  color:var(--amber);
-  letter-spacing:.8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  white-space:nowrap;
-}
-.brand-dot{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--amber);
-  box-shadow:0 0 10px var(--amber);
-  animation:pulse 2s ease-in-out infinite;
-}
+.topbar{background:rgba(7,11,18,.92);border-bottom:1px solid var(--bd1);padding:0 20px;height:52px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.brand{font-family:var(--fx);font-size:15px;font-weight:800;color:var(--amber);letter-spacing:.8px;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:pulse 2s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
-
-.live-badge{
-  font-family:var(--fm);
-  font-size:10px;
-  font-weight:700;
-  color:var(--green);
-  border:1px solid rgba(0,201,122,.3);
-  padding:2px 8px;
-  border-radius:3px;
-  letter-spacing:.8px;
-  background:var(--green2);
-}
+.live-badge{font-family:var(--fm);font-size:10px;font-weight:700;color:var(--green);border:1px solid rgba(0,201,122,.3);padding:2px 8px;border-radius:3px;letter-spacing:.8px;background:var(--green2);}
 .sep{width:1px;height:22px;background:var(--bd2);}
-.input-wrap{
-  flex:1;max-width:440px;display:flex;gap:8px;margin-left:auto;
-}
-.input-wrap input{
-  flex:1;background:var(--bg2);
-  border:1px solid var(--bd2);
-  color:var(--t1);
-  padding:8px 14px;border-radius:6px;
-  font-family:var(--fc);font-size:13px;font-weight:500;
-  outline:none;transition:border-color .2s;
-}
+.input-wrap{flex:1;max-width:440px;display:flex;gap:8px;margin-left:auto;}
+.input-wrap input{flex:1;background:var(--bg2);border:1px solid var(--bd2);color:var(--t1);padding:8px 14px;border-radius:6px;font-family:var(--fc);font-size:13px;font-weight:500;outline:none;transition:border-color .2s;}
 .input-wrap input:focus{border-color:var(--amber);}
 .input-wrap input::placeholder{color:var(--t3);}
-.btn-run{
-  background:var(--amber);color:#07050a;border:none;
-  padding:8px 20px;border-radius:6px;
-  font-family:var(--fc);font-size:13px;font-weight:700;
-  cursor:pointer;letter-spacing:.3px;
-  transition:opacity .2s,transform .1s;white-space:nowrap;
-}
+.btn-run{background:var(--amber);color:#07050a;border:none;padding:8px 20px;border-radius:6px;font-family:var(--fc);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s,transform .1s;white-space:nowrap;}
 .btn-run:hover{opacity:.88;}
 .btn-run:active{transform:scale(.97);}
 .btn-run:disabled{background:var(--bg3);color:var(--t3);cursor:not-allowed;transform:none;}
 
-/* ── MAIN ── */
 .main{padding:20px;}
-
-/* ── PLACEHOLDER ── */
 .ph{max-width:580px;margin:48px auto 0;text-align:center;}
 .ph-icon{font-size:42px;margin-bottom:18px;}
-.ph h2{
-  font-family:var(--fx);font-size:22px;font-weight:800;
-  color:var(--t1);margin-bottom:10px;letter-spacing:.3px;
-}
-.ph p{
-  font-family:var(--fb);font-size:13px;color:var(--t2);
-  line-height:1.85;margin-bottom:26px;
-}
-.ph-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;margin-bottom:26px;
-}
-.ph-card{
-  background:var(--bg2);border:1px solid var(--bd1);
-  border-radius:10px;padding:16px;text-align:left;
-  transition:border-color .2s,background .2s;cursor:default;
-}
+.ph h2{font-family:var(--fx);font-size:22px;font-weight:800;color:var(--t1);margin-bottom:10px;letter-spacing:.3px;}
+.ph p{font-family:var(--fb);font-size:13px;color:var(--t2);line-height:1.85;margin-bottom:26px;}
+.ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px;}
+.ph-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:10px;padding:16px;text-align:left;transition:border-color .2s,background .2s;}
 .ph-card:hover{border-color:var(--bd2);background:var(--bg3);}
 .ph-card-icon{font-size:18px;margin-bottom:8px;}
-.ph-card-name{
-  font-family:var(--fc);font-size:14px;font-weight:700;
-  color:var(--t1);margin-bottom:3px;
-}
-.ph-card-vi{
-  font-family:var(--fm);font-size:10px;color:var(--amber);
-  margin-bottom:9px;letter-spacing:.3px;
-}
+.ph-card-name{font-family:var(--fc);font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.ph-card-vi{font-family:var(--fm);font-size:10px;color:var(--amber);margin-bottom:9px;letter-spacing:.3px;}
 .ph-card-codes{display:flex;gap:6px;flex-wrap:wrap;}
-.ph-code{
-  font-family:var(--fm);font-size:11px;color:var(--amber);
-  background:var(--amber3);border:1px solid rgba(240,160,48,.2);
-  padding:2px 7px;border-radius:3px;
-}
+.ph-code{font-family:var(--fm);font-size:11px;color:var(--amber);background:var(--amber3);border:1px solid rgba(240,160,48,.2);padding:2px 7px;border-radius:3px;}
 .ph-note{font-family:var(--fb);font-size:11px;color:var(--t3);line-height:1.85;}
 
-/* ── LOADING ── */
 .loading{display:none;text-align:center;padding:80px 20px;}
 .loading.on{display:block;}
 .spinner{position:relative;width:44px;height:44px;margin:0 auto 18px;}
-.spinner::before{
-  content:'';position:absolute;inset:0;
-  border:2px solid var(--bd2);border-radius:50%;
-}
-.spinner::after{
-  content:'';position:absolute;inset:0;
-  border:2px solid transparent;border-top-color:var(--amber);
-  border-radius:50%;animation:spin .75s linear infinite;
-}
+.spinner::before{content:'';position:absolute;inset:0;border:2px solid var(--bd2);border-radius:50%;}
+.spinner::after{content:'';position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--amber);border-radius:50%;animation:spin .75s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ld-msg{
-  font-family:var(--fm);font-size:11px;color:var(--t2);letter-spacing:.8px;
-}
+.ld-msg{font-family:var(--fm);font-size:11px;color:var(--t2);letter-spacing:.8px;}
 
-/* ── DASHBOARD ── */
 .dash{display:none;}
 .dash.on{display:block;}
 
-.dh{
-  background:var(--bg1);border:1px solid var(--bd1);
-  border-radius:12px;padding:18px 22px;margin-bottom:12px;
-  display:flex;justify-content:space-between;align-items:center;gap:16px;
-}
-.dh-left h2{
-  font-family:var(--fx);font-size:18px;font-weight:800;
-  color:var(--t1);margin-bottom:4px;letter-spacing:.2px;
-}
+/* ③ 헤더 OVX 강조 */
+.dh{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:18px 22px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.dh-left h2{font-family:var(--fx);font-size:18px;font-weight:800;color:var(--t1);margin-bottom:4px;letter-spacing:.2px;}
 .dh-left p{font-family:var(--fb);font-size:12px;color:var(--t2);}
-.dh-badge{
-  background:var(--amber2);border:1px solid rgba(240,160,48,.35);
-  color:var(--amber);padding:7px 20px;border-radius:6px;
-  font-family:var(--fm);font-size:13px;font-weight:700;
-  letter-spacing:.3px;white-space:nowrap;
-}
+.dh-right{display:flex;align-items:center;gap:12px;}
+.dh-vol-box{text-align:center;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 18px;}
+.dh-vol-label{font-family:var(--fc);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.dh-vol-val{font-family:var(--fm);font-size:30px;font-weight:700;line-height:1.1;}
+.dh-vol-level{font-family:var(--fc);font-size:11px;font-weight:700;margin-top:2px;}
+.dh-badge{background:var(--amber2);border:1px solid rgba(240,160,48,.35);color:var(--amber);padding:7px 20px;border-radius:6px;font-family:var(--fm);font-size:13px;font-weight:700;letter-spacing:.3px;white-space:nowrap;}
 
-/* ── TOP ROW ── */
-.top-row{
-  display:grid;grid-template-columns:220px 1fr;
-  gap:12px;margin-bottom:12px;
-}
+.top-row{display:grid;grid-template-columns:220px 1fr;gap:12px;margin-bottom:12px;}
+.gauge-box{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:20px 16px 16px;display:flex;flex-direction:column;align-items:center;}
+.gauge-lbl{font-family:var(--fc);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px;}
+.g-score{font-family:var(--fm);font-size:56px;font-weight:700;line-height:1;}
+.g-sub{font-family:var(--fc);font-size:11px;color:var(--t3);margin-top:5px;text-align:center;}
+.g-verdict{margin-top:12px;padding:5px 18px;border-radius:4px;font-family:var(--fc);font-size:12px;font-weight:700;letter-spacing:.3px;border:1px solid;}
 
-.gauge-box{
-  background:var(--bg1);border:1px solid var(--bd1);
-  border-radius:12px;padding:20px 16px 16px;
-  display:flex;flex-direction:column;align-items:center;
-}
-.gauge-lbl{
-  font-family:var(--fc);font-size:10px;font-weight:700;
-  color:var(--t3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px;
-}
-.g-score{
-  font-family:var(--fm);font-size:56px;font-weight:700;line-height:1;
-}
-.g-sub{
-  font-family:var(--fc);font-size:11px;color:var(--t3);
-  margin-top:5px;text-align:center;
-}
-.g-verdict{
-  margin-top:12px;padding:5px 18px;border-radius:4px;
-  font-family:var(--fc);font-size:12px;font-weight:700;
-  letter-spacing:.3px;border:1px solid;
-}
-
-/* ── METRICS ── */
-.metrics{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  grid-template-rows:1fr 1fr;gap:8px;
-}
-.mc{
-  background:var(--bg1);border:1px solid var(--bd1);
-  border-radius:10px;padding:13px 12px;
-  display:flex;flex-direction:column;gap:2px;
-}
-.mc-lbl{
-  font-family:var(--fc);font-size:10px;font-weight:700;
-  color:var(--t3);text-transform:uppercase;letter-spacing:.6px;
-}
-.mc-val{
-  font-family:var(--fm);font-size:26px;font-weight:700;
-  color:var(--t1);line-height:1.2;
-}
+/* ④ 지표 + 해석 텍스트 */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:8px;}
+.mc{background:var(--bg1);border:1px solid var(--bd1);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;}
+.mc-lbl{font-family:var(--fc);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;}
+.mc-val{font-family:var(--fm);font-size:24px;font-weight:700;color:var(--t1);line-height:1.2;}
 .mc-sub{font-family:var(--fc);font-size:11px;color:var(--t3);}
-.mc-tag{
-  display:inline-flex;align-items:center;gap:3px;
-  margin-top:6px;font-family:var(--fc);font-size:11px;font-weight:700;
-  padding:2px 8px;border-radius:3px;width:fit-content;letter-spacing:.2px;
-}
+.mc-interp{font-family:var(--fb);font-size:11px;color:var(--t2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd1);line-height:1.5;}
+.mc-tag{display:inline-flex;align-items:center;gap:3px;margin-top:5px;font-family:var(--fc);font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;width:fit-content;letter-spacing:.2px;}
 .tag-red{color:var(--red);background:var(--red2);}
 .tag-green{color:var(--green);background:var(--green2);}
 .tag-gray{color:var(--t2);background:rgba(255,255,255,.05);}
 .tag-yellow{color:var(--amber);background:var(--amber2);}
 
-/* ── ALERT ── */
-.alert-box{
-  background:rgba(255,68,56,.05);
-  border:1px solid rgba(255,68,56,.22);
-  border-left:3px solid var(--red);
-  border-radius:10px;padding:14px 18px;margin-bottom:12px;
-}
-.alert-head{
-  font-family:var(--fc);font-size:13px;font-weight:700;
-  color:var(--red);margin-bottom:6px;letter-spacing:.2px;
-}
+.alert-box{background:rgba(255,68,56,.05);border:1px solid rgba(255,68,56,.22);border-left:3px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+.alert-head{font-family:var(--fc);font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;letter-spacing:.2px;}
 .alert-body{font-family:var(--fb);font-size:13px;color:#ffb090;line-height:1.8;}
 
-/* ── TWO COL ── */
-.two-col{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:12px;margin-bottom:12px;align-items:start;
-}
-.card{
-  background:var(--bg1);border:1px solid var(--bd1);
-  border-radius:12px;padding:18px;min-width:0;
-}
-.card-title{
-  font-family:var(--fc);font-size:10px;font-weight:700;
-  color:var(--t3);text-transform:uppercase;letter-spacing:.9px;
-  margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bd1);
-}
+/* ① 매매 시그널 박스 */
+.signal-box{border-radius:12px;padding:20px 22px;margin-bottom:12px;border:1px solid;}
+.signal-box.sig-sell{background:rgba(255,68,56,.06);border-color:rgba(255,68,56,.3);}
+.signal-box.sig-neutral{background:rgba(240,160,48,.06);border-color:rgba(240,160,48,.3);}
+.signal-box.sig-buy{background:rgba(0,201,122,.06);border-color:rgba(0,201,122,.3);}
+.signal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.signal-title{font-family:var(--fc);font-size:15px;font-weight:700;letter-spacing:.3px;}
+.signal-badge{font-family:var(--fm);font-size:12px;font-weight:700;padding:4px 14px;border-radius:4px;border:1px solid;white-space:nowrap;}
+.sig-sell .signal-title,.sig-sell .signal-badge{color:var(--red);}
+.sig-sell .signal-badge{border-color:rgba(255,68,56,.4);background:rgba(255,68,56,.1);}
+.sig-neutral .signal-title,.sig-neutral .signal-badge{color:var(--amber);}
+.sig-neutral .signal-badge{border-color:rgba(240,160,48,.4);background:rgba(240,160,48,.1);}
+.sig-buy .signal-title,.sig-buy .signal-badge{color:var(--green);}
+.sig-buy .signal-badge{border-color:rgba(0,201,122,.4);background:rgba(0,201,122,.1);}
+.signal-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.signal-item{background:rgba(255,255,255,.03);border:1px solid var(--bd1);border-radius:8px;padding:14px;}
+.signal-item-icon{font-size:16px;margin-bottom:7px;}
+.signal-item-title{font-family:var(--fc);font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.signal-item-desc{font-family:var(--fb);font-size:12px;color:var(--t1);line-height:1.65;}
+.signal-disclaimer{font-family:var(--fb);font-size:11px;color:var(--t3);margin-top:12px;padding-top:10px;border-top:1px solid var(--bd1);}
 
-/* ── FACTOR BARS ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
+.card{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:18px;min-width:0;}
+.card-title{font-family:var(--fc);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bd1);}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.bar-name{
-  font-family:var(--fc);font-size:12px;font-weight:600;
-  color:var(--t2);width:108px;flex-shrink:0;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.bar-track{
-  flex:1;background:var(--bg3);border-radius:2px;
-  height:18px;overflow:hidden;min-width:0;
-}
-.bar-fill{
-  height:100%;border-radius:2px;
-  transition:width 1.3s cubic-bezier(.4,0,.2,1);
-}
-.bar-pct{
-  font-family:var(--fm);font-size:12px;font-weight:700;
-  color:var(--t1);width:36px;text-align:right;flex-shrink:0;
-}
+.bar-name{font-family:var(--fc);font-size:12px;font-weight:600;color:var(--t2);width:108px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;background:var(--bg3);border-radius:2px;height:18px;overflow:hidden;min-width:0;}
+.bar-fill{height:100%;border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
+.bar-pct{font-family:var(--fm);font-size:12px;font-weight:700;color:var(--t1);width:36px;text-align:right;flex-shrink:0;}
 
-/* ── OVX CHART ── */
-.ovx-explain{
-  background:var(--amber3);border:1px solid rgba(240,160,48,.15);
-  border-radius:6px;padding:10px 14px;margin-bottom:14px;
-  font-family:var(--fb);font-size:12px;color:var(--t2);line-height:1.75;
-}
-.ovx-explain b{color:var(--amber);}
-.ovx-bar-area{
-  display:flex;align-items:flex-end;gap:6px;
-  height:100px;padding:0 4px;border-bottom:1px solid var(--bd2);
-}
+/* ② IV vs HV 차트 */
+.iv-hv-row{margin-bottom:14px;}
+.iv-hv-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.iv-hv-name{font-family:var(--fc);font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;}
+.iv-hv-val{font-family:var(--fm);font-size:18px;font-weight:700;}
+.iv-hv-track{background:var(--bg3);border-radius:3px;height:24px;overflow:hidden;}
+.iv-hv-fill{height:100%;border-radius:3px;transition:width 1.3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;padding-left:10px;}
+.iv-hv-fill span{font-family:var(--fc);font-size:11px;font-weight:700;color:rgba(0,0,0,.75);white-space:nowrap;}
+.iv-hv-diff{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
+.iv-hv-diff-label{font-family:var(--fc);font-size:11px;color:var(--t2);}
+.iv-hv-diff-val{font-family:var(--fm);font-size:18px;font-weight:700;}
+.iv-hv-interp{font-family:var(--fb);font-size:12px;color:var(--t2);margin-top:10px;line-height:1.65;background:var(--amber3);border:1px solid rgba(240,160,48,.15);border-radius:6px;padding:10px 12px;}
+
+.ovx-bar-area{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px;border-bottom:1px solid var(--bd2);}
 .ovx-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;}
 .ovx-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;}
-.ovx-labels{display:flex;gap:6px;padding:10px 4px 0;margin-bottom:4px;}
-.ovx-label-col{
-  flex:1;min-width:0;display:flex;
-  flex-direction:column;align-items:center;gap:3px;
-}
+.ovx-labels{display:flex;gap:6px;padding:10px 4px 0;}
+.ovx-label-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .ovx-num{font-family:var(--fm);font-size:12px;font-weight:700;text-align:center;}
-.ovx-meaning{font-family:var(--fc);font-size:10px;font-weight:700;text-align:center;}
 .ovx-event{font-family:var(--fc);font-size:10px;color:var(--t3);text-align:center;line-height:1.4;}
 
-/* ── COMMENTARY ── */
-.commentary{
-  background:var(--bg1);border:1px solid var(--bd1);
-  border-radius:12px;padding:22px;margin-bottom:4px;
-}
-.comm-title{
-  font-family:var(--fx);font-size:16px;font-weight:800;
-  color:var(--t1);margin-bottom:14px;padding-bottom:12px;
-  border-bottom:1px solid var(--bd1);letter-spacing:.3px;
-}
-.comm-p{
-  font-family:var(--fb);font-size:13px;color:var(--t2);
-  line-height:1.9;margin-bottom:10px;
-}
-
-/* ── ERROR ── */
-.err-box{
-  background:var(--red2);border:1px solid rgba(255,68,56,.28);
-  border-radius:10px;padding:16px 18px;
-  color:#ff8070;font-family:var(--fm);font-size:12px;letter-spacing:.3px;
-}
+.commentary{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:22px;margin-bottom:4px;}
+.comm-title{font-family:var(--fx);font-size:16px;font-weight:800;color:var(--t1);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd1);letter-spacing:.3px;}
+.comm-p{font-family:var(--fb);font-size:13px;color:var(--t2);line-height:1.9;margin-bottom:10px;}
+.err-box{background:var(--red2);border:1px solid rgba(255,68,56,.28);border-radius:10px;padding:16px 18px;color:#ff8070;font-family:var(--fm);font-size:12px;letter-spacing:.3px;}
 </style>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="brand">
-    <div class="brand-dot"></div>
-    OPX ANALYZER
-  </div>
+  <div class="brand"><div class="brand-dot"></div>OPX ANALYZER</div>
   <div class="live-badge">LIVE</div>
   <div class="sep"></div>
   <div class="input-wrap">
@@ -360,88 +166,69 @@ body{
     <button class="btn-run" id="btn" onclick="run()">분석 실행</button>
   </div>
 </div>
-
-<!-- MAIN -->
 <div class="main">
-
-  <!-- PLACEHOLDER -->
   <div class="ph" id="ph">
     <div class="ph-icon">📊</div>
     <h2>옵션 프리미엄 고평가 분석기</h2>
     <p>CBOE·ICE 공식 변동성 지수 기반으로<br>옵션 프리미엄의 고평가 여부를 실시간 분석합니다.</p>
     <div class="ph-grid">
-      <div class="ph-card">
-        <div class="ph-card-icon">🛢</div>
-        <div class="ph-card-name">WTI 원유</div>
-        <div class="ph-card-vi">OVX — CBOE</div>
-        <div class="ph-card-codes">
-          <span class="ph-code">원유 콜</span>
-          <span class="ph-code">원유 풋</span>
-        </div>
-      </div>
-      <div class="ph-card">
-        <div class="ph-card-icon">📈</div>
-        <div class="ph-card-name">S&P500 지수</div>
-        <div class="ph-card-vi">VIX — CBOE</div>
-        <div class="ph-card-codes">
-          <span class="ph-code">지수 콜</span>
-          <span class="ph-code">지수 풋</span>
-        </div>
-      </div>
-      <div class="ph-card">
-        <div class="ph-card-icon">🥇</div>
-        <div class="ph-card-name">골드 (금)</div>
-        <div class="ph-card-vi">GVZ — CBOE</div>
-        <div class="ph-card-codes">
-          <span class="ph-code">골드 콜</span>
-          <span class="ph-code">금 풋</span>
-        </div>
-      </div>
-      <div class="ph-card">
-        <div class="ph-card-icon">📊</div>
-        <div class="ph-card-name">10년 국채</div>
-        <div class="ph-card-vi">MOVE — ICE</div>
-        <div class="ph-card-codes">
-          <span class="ph-code">국채 콜</span>
-          <span class="ph-code">국채 풋</span>
-        </div>
-      </div>
+      <div class="ph-card"><div class="ph-card-icon">🛢</div><div class="ph-card-name">WTI 원유</div><div class="ph-card-vi">OVX — CBOE</div><div class="ph-card-codes"><span class="ph-code">원유 콜</span><span class="ph-code">원유 풋</span></div></div>
+      <div class="ph-card"><div class="ph-card-icon">📈</div><div class="ph-card-name">S&P500 지수</div><div class="ph-card-vi">VIX — CBOE</div><div class="ph-card-codes"><span class="ph-code">지수 콜</span><span class="ph-code">지수 풋</span></div></div>
+      <div class="ph-card"><div class="ph-card-icon">🥇</div><div class="ph-card-name">골드 (금)</div><div class="ph-card-vi">GVZ — CBOE</div><div class="ph-card-codes"><span class="ph-code">골드 콜</span><span class="ph-code">금 풋</span></div></div>
+      <div class="ph-card"><div class="ph-card-icon">📊</div><div class="ph-card-name">10년 국채</div><div class="ph-card-vi">MOVE — ICE</div><div class="ph-card-codes"><span class="ph-code">국채 콜</span><span class="ph-code">국채 풋</span></div></div>
     </div>
     <p class="ph-note">📡 데이터 출처: Yahoo Finance (CBOE·ICE 공식 지수) · 약 15~20분 지연<br>📌 교육 목적 자료 · 실제 투자 결정에 단독 활용 금지</p>
   </div>
-
-  <!-- LOADING -->
-  <div class="loading" id="ld">
-    <div class="spinner"></div>
-    <div class="ld-msg" id="ldmsg">INITIALIZING...</div>
-  </div>
-
-  <!-- DASHBOARD -->
+  <div class="loading" id="ld"><div class="spinner"></div><div class="ld-msg" id="ldmsg">INITIALIZING...</div></div>
   <div class="dash" id="dash"></div>
-
 </div>
-
 <script>
 const EVENTS={"23Q2":"SVB 파산\n신용위기","23Q4":"중동\n분쟁 격화","24Q2":"이란·이스라엘\n충돌","24Q4":"미국\n대선","현재":"관세전쟁\n무역분쟁"};
 const LM=["FETCHING MARKET DATA...","PROCESSING OVX · WTI...","COMPUTING PREMIUM FACTORS...","RENDERING DASHBOARD..."];
 
-function ovxColor(v){
-  const t=Math.min(Math.max((v-20)/55,0),1);
-  return `rgb(${Math.round(160+t*80)},${Math.round(120-t*104)},16)`;
-}
-function ovxLevel(v){
-  if(v>=50)return{label:"매우 불안"};
-  if(v>=40)return{label:"불안"};
-  if(v>=30)return{label:"보통"};
-  return{label:"안정"};
+function ovxColor(v){const t=Math.min(Math.max((v-20)/55,0),1);return`rgb(${Math.round(160+t*80)},${Math.round(120-t*104)},16)`;}
+function ovxLevel(v){if(v>=50)return"매우 불안";if(v>=40)return"불안";if(v>=30)return"보통";return"안정";}
+
+function buildSignal(sc,optType,ivDir,ratio,ivPct){
+  const pct=parseFloat(ivPct)||0;
+  let cls,badge,title,items;
+  if(sc>=70){
+    cls="sig-sell";
+    badge=optType==="콜"?"⚠ 콜 매도 고려 구간":"⚠ 풋 매도 고려 구간";
+    title="🔴 프리미엄 고평가 — 옵션 매도 유리 구간";
+    items=[
+      {icon:"📉",t:"포지션 전략",d:optType==="콜"?"콜 옵션 프리미엄 과도. 커버드콜 또는 콜 매도(Short Call) 전략 검토 가능":"풋 옵션 프리미엄 과도. 캐시 시큐어드 풋 또는 풋 매도(Short Put) 전략 검토 가능"},
+      {icon:"⏱",t:"타이밍 근거",d:`IV 백분위 ${ivPct} — 상위권 위치. 변동성 평균 회귀 시 프리미엄 하락 예상`},
+      {icon:"🛡",t:"리스크 관리",d:"매도 포지션은 무제한 손실 가능. 반드시 손절선·포지션 크기 제한 필수. 단독 매매 판단 금지"}
+    ];
+  }else if(sc>=40){
+    cls="sig-neutral";
+    badge="→ 중립 — 신중한 접근";
+    title="🟡 프리미엄 적정 — 방향성 확인 후 진입";
+    items=[
+      {icon:"⚖",t:"현재 상황",d:"IV가 HV 대비 크게 고평가되지 않은 상태. 프리미엄 매도·매수 어느 쪽도 뚜렷한 우위 없음"},
+      {icon:"👀",t:"관찰 포인트",d:`IV 방향성 '${ivDir}' — 추세 변화 시 재분석 권장. IV/HV 배율 ${ratio}× 추이 모니터링`},
+      {icon:"📋",t:"대응 전략",d:"방향성 확신 있을 경우 매수 전략 가능. 프리미엄이 낮아 매수 불리하지 않은 수준"}
+    ];
+  }else{
+    cls="sig-buy";
+    badge=optType==="콜"?"✓ 콜 매수 유리 구간":"✓ 풋 매수 유리 구간";
+    title="🟢 프리미엄 저평가 — 옵션 매수 유리 구간";
+    items=[
+      {icon:"📈",t:"포지션 전략",d:optType==="콜"?"콜 옵션 프리미엄 저렴. 방향성 상승 시 콜 매수(Long Call) 전략 검토 가능":"풋 옵션 프리미엄 저렴. 방향성 하락 시 풋 매수(Long Put) 전략 검토 가능"},
+      {icon:"💡",t:"타이밍 근거",d:`IV 백분위 ${ivPct} — 하위권. 변동성 상승 시 옵션 가치 상승 기대 가능`},
+      {icon:"🛡",t:"리스크 관리",d:"매수 포지션은 최대 손실이 프리미엄으로 한정. 단, 시간가치 손실(Theta) 주의 필요"}
+    ];
+  }
+  return{cls,badge,title,items};
 }
 
 async function run(){
   const q=document.getElementById("q").value.trim();
-  if(!q){alert("원유 콜 또는 원유 풋을 입력해주세요.");return;}
+  if(!q){alert("예: 원유 콜, 골드 풋");return;}
   const isCall=q.includes("콜")||q.toLowerCase().includes("call");
   const isPut=q.includes("풋")||q.toLowerCase().includes("put");
-  if(!isCall&&!isPut){alert('"원유 콜" 또는 "원유 풋"을 입력해주세요.');return;}
+  if(!isCall&&!isPut){alert('"콜" 또는 "풋"을 포함해서 입력해주세요.');return;}
   const optType=isCall?"콜":"풋";
   const assetParam=encodeURIComponent(q.replace(/콜|풋|call|put/gi,'').trim()||'원유');
   document.getElementById("ph").style.display="none";
@@ -455,8 +242,8 @@ async function run(){
     if(!res.ok)throw new Error(`서버 오류: ${res.status}`);
     const d=await res.json();
     if(d.error)throw new Error(d.error);
-    d.factors=Array.isArray(d.factors)&&d.factors.length?d.factors:[{name:"IV 퍼센타일",pct:70},{name:"지정학 리스크",pct:65},{name:"계절적 수요",pct:50},{name:"달러 강세",pct:45},{name:"투기 포지션",pct:40}];
-    d.ovx_history=Array.isArray(d.ovx_history)&&d.ovx_history.length?d.ovx_history:[{label:"21Q4",value:32},{label:"22Q2",value:58},{label:"22Q4",value:41},{label:"23Q2",value:28},{label:"현재",value:38}];
+    d.factors=Array.isArray(d.factors)&&d.factors.length?d.factors:[{name:"지정학 리스크",pct:70},{name:"공급 불확실성",pct:65},{name:"계절적 수요",pct:50},{name:"달러 강세",pct:45},{name:"투기 포지션",pct:40}];
+    d.ovx_history=Array.isArray(d.ovx_history)&&d.ovx_history.length?d.ovx_history:[{label:"23Q2",value:34},{label:"23Q4",value:56},{label:"24Q2",value:47},{label:"24Q4",value:34},{label:"현재",value:96}];
     d.commentary=Array.isArray(d.commentary)&&d.commentary.length?d.commentary:["분석 데이터를 불러왔습니다."];
     clearInterval(iv);ld.classList.remove("on");
     render(d,optType);
@@ -473,45 +260,36 @@ function render(d,optType){
   const scCol=sc>=70?"#ff4438":sc>=40?"#f0a030":"#00c97a";
   const tagBg=sc>=70?"rgba(255,68,56,.12)":sc>=40?"rgba(240,160,48,.12)":"rgba(0,201,122,.12)";
   const verdict=d.verdict||(sc>=70?"고평가":sc>=40?"적정":"저평가");
-
-  // Gauge arc
-  const r=72,cx=90,cy=88;
-  const sa=-Math.PI,ea=0;
+  const r=72,cx=90,cy=88,sa=-Math.PI,ea=0;
   const fe=sa+(ea-sa)*(sc/100);
   const x1=cx+r*Math.cos(sa),y1=cy+r*Math.sin(sa);
   const cfx=cx+r*Math.cos(fe),cfy=cy+r*Math.sin(fe);
   const lg=(fe-sa)>Math.PI?1:0;
   const x2=cx+r*Math.cos(ea),y2=cy+r*Math.sin(ea);
-
-  // Tick marks at 25, 50, 75
   const ticks=[25,50,75].map(p=>{
-    const ang=sa+(ea-sa)*(p/100);
-    const ri=r+5,ro=r+13;
-    return `<line x1="${(cx+ri*Math.cos(ang)).toFixed(1)}" y1="${(cy+ri*Math.sin(ang)).toFixed(1)}" x2="${(cx+ro*Math.cos(ang)).toFixed(1)}" y2="${(cy+ro*Math.sin(ang)).toFixed(1)}" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>`;
+    const ang=sa+(ea-sa)*(p/100),ri=r+5,ro=r+13;
+    return`<line x1="${(cx+ri*Math.cos(ang)).toFixed(1)}" y1="${(cy+ri*Math.sin(ang)).toFixed(1)}" x2="${(cx+ro*Math.cos(ang)).toFixed(1)}" y2="${(cy+ro*Math.sin(ang)).toFixed(1)}" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>`;
   }).join('');
 
-  // OVX bars
   const ovx=d.ovx_history||[];
   const maxV=Math.max(...ovx.map(o=>o.value),1);
   const ovxBarDivs=ovx.map((o,i)=>{
     const isNow=o.label==="현재"||i===ovx.length-1;
     const h=Math.round((o.value/maxV)*100);
     const barCol=isNow?"#f0a030":ovxColor(o.value);
-    return `<div class="ovx-col"><div class="ovx-bar" style="height:${h}px;background:${barCol};${isNow?"box-shadow:0 0 10px rgba(240,160,48,.35)":""}"></div></div>`;
+    return`<div class="ovx-col"><div class="ovx-bar" style="height:${h}px;background:${barCol};${isNow?"box-shadow:0 0 10px rgba(240,160,48,.35)":""}"></div></div>`;
   }).join("");
   const ovxLabelDivs=ovx.map((o,i)=>{
     const isNow=o.label==="현재"||i===ovx.length-1;
-    const lv=ovxLevel(o.value);
     const barCol=isNow?"#f0a030":ovxColor(o.value);
     const evt=(EVENTS[o.label]||o.label).split("\n");
-    return `<div class="ovx-label-col"><div class="ovx-num" style="color:${barCol}">${o.value}</div><div class="ovx-meaning" style="color:${barCol}">${lv.label}</div>${evt.map(e=>`<div class="ovx-event">${e}</div>`).join("")}</div>`;
+    return`<div class="ovx-label-col"><div class="ovx-num" style="color:${barCol}">${o.value}</div><div style="font-family:var(--fc);font-size:10px;font-weight:700;color:${barCol};text-align:center">${ovxLevel(o.value)}</div>${evt.map(e=>`<div class="ovx-event">${e}</div>`).join("")}</div>`;
   }).join("");
 
-  // Factor bars
   const fbars=(d.factors||[]).map(f=>{
     const t=f.pct/100;
-    const barCol=`rgb(${Math.round(240-t*76)},${Math.round(160-t*144)},${Math.round(48-t*32)})`;
-    return `<div class="bar-row"><div class="bar-name">${f.name}</div><div class="bar-track"><div class="bar-fill" style="width:${f.pct}%;background:${barCol}"></div></div><div class="bar-pct">${f.pct}%</div></div>`;
+    const bc=`rgb(${Math.round(240-t*76)},${Math.round(160-t*144)},${Math.round(48-t*32)})`;
+    return`<div class="bar-row"><div class="bar-name">${f.name}</div><div class="bar-track"><div class="bar-fill" style="width:${f.pct}%;background:${bc}"></div></div><div class="bar-pct">${f.pct}%</div></div>`;
   }).join("");
 
   const ivDir=d.iv_direction||"";
@@ -519,14 +297,75 @@ function render(d,optType){
   const ivArrow=ivDir==="상승"?"▲ ":ivDir==="하락"?"▼ ":"→ ";
   const hv_premium=d.hv_discount??d.hv_premium??0;
   const iv_hv_ratio=d.iv_hv_ratio??d.hv_iv_ratio??1;
+  const volCur=d.vol_current??0;
+  const hv=d.hv??0;
+  const volTicker=d.vol_ticker||"IV";
+  const ivPct=d.iv_percentile||"0%";
+  const ivRank=d.iv_rank||0;
+
+  // ③ OVX 강조 색상
+  const volCol=volCur>=50?"#ff4438":volCur>=40?"#f0a030":volCur>=30?"#e8c040":"#00c97a";
+  const volLevel=ovxLevel(volCur);
+
+  // ① 시그널
+  const sig=buildSignal(sc,optType,ivDir,iv_hv_ratio,ivPct);
+  const sigItemsHtml=sig.items.map(it=>`<div class="signal-item"><div class="signal-item-icon">${it.icon}</div><div class="signal-item-title">${it.t}</div><div class="signal-item-desc">${it.d}</div></div>`).join("");
+
+  // ④ 해석 텍스트
+  const ivRankInterp=ivRank>=70?"과거 1년 중 상위권 — 프리미엄이 비싼 시기":ivRank>=40?"중간 수준 — 특별히 비싸거나 싸지 않음":"하위권 — 프리미엄 상대적으로 저렴";
+  const ivPctInterp=parseFloat(ivPct)>=70?"최근 1년 대비 상위 변동성 구간":"최근 1년 대비 낮거나 중간 수준";
+  const ivDirInterp=ivDir==="상승"?"변동성 확대 중 → 프리미엄 상승 추세":ivDir==="하락"?"변동성 축소 중 → 프리미엄 하락 추세":"방향성 불명확 — 관망 유효";
+  const hvInterp=hv_premium>10?"IV가 HV 대비 크게 높음 → 매도자 유리":hv_premium>0?"IV가 HV보다 소폭 높음 — 정상 범위":"IV가 HV보다 낮음 → 프리미엄 저렴";
+  const ratioInterp=iv_hv_ratio>=1.3?"실제 변동성 대비 1.3배 이상 — 고평가":iv_hv_ratio>=1.0?"실제 변동성 대비 약간 높은 수준":"실제 변동성과 유사 — 적정 수준";
+  const cpNum=parseFloat(d.call_put_ratio)||1;
+  const cpInterp=cpNum>1.5?"콜 수요 강세 — 상승 베팅 우세":cpNum<0.7?"풋 수요 강세 — 하락 헤지 우세":"콜·풋 수요 균형 — 방향성 중립";
+
+  // ② IV vs HV 비교
+  const maxIvHv=Math.max(volCur,hv,1);
+  const ivW=Math.round((volCur/maxIvHv)*100);
+  const hvW=Math.round((hv/maxIvHv)*100);
+  const diffSign=hv_premium>0?"+":"";
+  const diffCol=hv_premium>10?"#ff4438":hv_premium>0?"#f0a030":"#00c97a";
+  const ivHvInterpText=hv_premium>10
+    ?`${volTicker}(${volCur})가 실제 역사적 변동성 HV(${hv})보다 ${hv_premium}pt 높습니다. 시장이 앞으로의 변동성을 실제보다 크게 예상하고 있어 옵션 프리미엄이 과도하게 형성된 상태입니다.`
+    :hv_premium>0
+    ?`${volTicker}(${volCur})가 HV(${hv})보다 소폭 높은 정상 범위입니다. 불확실성에 대한 프리미엄이 적정하게 반영된 상태입니다.`
+    :`${volTicker}(${volCur})가 HV(${hv})보다 낮거나 같습니다. 시장이 앞으로의 변동성을 낮게 예상하고 있어 옵션 프리미엄이 저렴한 편입니다.`;
+
+  // 히스토리 맥락 해석 텍스트 생성
+  const curOvx=ovx.length?ovx[ovx.length-1].value:volCur;
+  const pastPoints=ovx.slice(0,-1);
+  const abovePast=pastPoints.filter(o=>curOvx>o.value);
+  const maxPast=pastPoints.length?Math.max(...pastPoints.map(o=>o.value)):0;
+  const maxPastLabel=pastPoints.length?pastPoints.find(o=>o.value===maxPast)?.label||"":"";;
+  const maxPastEvent=EVENTS[maxPastLabel]?(EVENTS[maxPastLabel].replace("\n"," ")):"";
+  let ovxContextText="";
+  if(curOvx>=50){
+    if(abovePast.length===pastPoints.length){
+      ovxContextText=`현재 ${volTicker} <b style="color:var(--amber)">${curOvx}</b>는 차트상 모든 과거 이벤트(최고치 ${maxPast} · ${maxPastEvent})를 상회하는 극단적 수준입니다. 이처럼 변동성이 역사적 고점 부근일 때는 옵션 프리미엄이 과도하게 부풀어 있는 경우가 많아, <b style="color:var(--amber)">옵션 매도(프리미엄 수취) 전략이 통계적으로 유리한 환경</b>입니다. 단, 변동성이 추가 급등할 수 있으므로 포지션 크기 관리 필수.`;
+    }else{
+      ovxContextText=`현재 ${volTicker} <b style="color:var(--amber)">${curOvx}</b>는 과거 위기 이벤트 대부분을 상회하는 높은 수준입니다. 변동성이 과거 평균 대비 높다는 것은 옵션 매수자가 프리미엄을 과도하게 지불하고 있을 가능성을 의미하며, <b style="color:var(--amber)">옵션 매도 전략이 유리한 환경</b>으로 볼 수 있습니다.`;
+    }
+  }else if(curOvx>=35){
+    ovxContextText=`현재 ${volTicker} <b style="color:var(--amber)">${curOvx}</b>는 과거 위기 수준(${maxPast} · ${maxPastEvent})에는 미치지 않지만, 평상시보다 높은 구간입니다. 변동성이 상승 중이라면 프리미엄 매도에 유리하고, 하락 전환 시 프리미엄이 빠르게 감소할 수 있어 <b style="color:var(--amber)">방향성 확인 후 전략 수립</b>을 권장합니다.`;
+  }else{
+    ovxContextText=`현재 ${volTicker} <b style="color:var(--amber)">${curOvx}</b>는 과거 위기 수준(최고 ${maxPast})에 비해 낮은 안정적인 구간입니다. 변동성이 낮을 때는 옵션 프리미엄이 저렴하므로 <b style="color:var(--amber)">옵션 매수(Long) 전략이 비용 측면에서 유리</b>합니다. 단, 향후 변동성 상승 가능성을 염두에 두어야 합니다.`;
+  }
 
   document.getElementById("dash").innerHTML=`
   <div class="dh">
     <div class="dh-left">
       <h2>${d.emoji||'🛢'} ${d.asset_name||'원유'} ${d.option_type||optType} 옵션 — 프리미엄 고평가 분석</h2>
-      <p>Yahoo Finance 실제 데이터 기반 밸류에이션 판정 결과</p>
+      <p>Yahoo Finance 실제 데이터 기반 · ${d.updated_at||''}</p>
     </div>
-    <div class="dh-badge">${d.option_type||optType}</div>
+    <div class="dh-right">
+      <div class="dh-vol-box">
+        <div class="dh-vol-label">${volTicker} 현재</div>
+        <div class="dh-vol-val" style="color:${volCol}">${volCur}</div>
+        <div class="dh-vol-level" style="color:${volCol}">${volLevel}</div>
+      </div>
+      <div class="dh-badge">${d.option_type||optType}</div>
+    </div>
   </div>
 
   <div class="top-row">
@@ -542,42 +381,12 @@ function render(d,optType){
       <div class="g-verdict" style="color:${scCol};background:${tagBg};border-color:${scCol}33">● ${verdict} 구간</div>
     </div>
     <div class="metrics">
-      <div class="mc">
-        <div class="mc-lbl">선물 IVR</div>
-        <div class="mc-val">${d.iv_rank}</div>
-        <div class="mc-sub">IV Rank (0~100)</div>
-        <span class="mc-tag tag-red">▲ 상위권</span>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">IV 백분위</div>
-        <div class="mc-val">${d.iv_percentile}</div>
-        <div class="mc-sub">과거 대비 높은 수준</div>
-        <span class="mc-tag tag-red">▲ 과거 대비 높음</span>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">IV 방향성</div>
-        <div class="mc-val" style="font-size:22px">${d.iv_direction}</div>
-        <div class="mc-sub">최근 추이</div>
-        <span class="mc-tag ${ivCls}">${ivArrow}${ivDir==="상승"?"변동성 확대":ivDir==="하락"?"변동성 축소":"횡보 중"}</span>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">HV 대비 프리미엄</div>
-        <div class="mc-val">+${hv_premium}%</div>
-        <div class="mc-sub">실제보다 비싼 정도</div>
-        <span class="mc-tag tag-yellow">▲ 프리미엄 과다</span>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">HV/IV 배율</div>
-        <div class="mc-val">${iv_hv_ratio}:1</div>
-        <div class="mc-sub">실제 변동성 대비</div>
-        <span class="mc-tag tag-red">▲ 1.2 초과</span>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">콜/풋 비율</div>
-        <div class="mc-val">${d.call_put_ratio}</div>
-        <div class="mc-sub">C/P 수요 비율</div>
-        <span class="mc-tag tag-gray">● 시장 방향성</span>
-      </div>
+      <div class="mc"><div class="mc-lbl">선물 IVR</div><div class="mc-val">${d.iv_rank}</div><div class="mc-sub">IV Rank (0~100)</div><div class="mc-interp">${ivRankInterp}</div><span class="mc-tag tag-red">▲ 상위권</span></div>
+      <div class="mc"><div class="mc-lbl">IV 백분위</div><div class="mc-val">${ivPct}</div><div class="mc-sub">1년 기준 백분위</div><div class="mc-interp">${ivPctInterp}</div><span class="mc-tag tag-red">▲ 과거 대비 높음</span></div>
+      <div class="mc"><div class="mc-lbl">IV 방향성</div><div class="mc-val" style="font-size:20px">${d.iv_direction}</div><div class="mc-sub">최근 5일 추이</div><div class="mc-interp">${ivDirInterp}</div><span class="mc-tag ${ivCls}">${ivArrow}${ivDir==="상승"?"변동성 확대":ivDir==="하락"?"변동성 축소":"횡보 중"}</span></div>
+      <div class="mc"><div class="mc-lbl">HV 대비 프리미엄</div><div class="mc-val">+${hv_premium}%</div><div class="mc-sub">IV − HV 차이</div><div class="mc-interp">${hvInterp}</div><span class="mc-tag tag-yellow">▲ 프리미엄 과다</span></div>
+      <div class="mc"><div class="mc-lbl">IV / HV 배율</div><div class="mc-val">${iv_hv_ratio}×</div><div class="mc-sub">실제 변동성 대비</div><div class="mc-interp">${ratioInterp}</div><span class="mc-tag tag-red">▲ 1.2배 초과</span></div>
+      <div class="mc"><div class="mc-lbl">콜 / 풋 비율</div><div class="mc-val">${d.call_put_ratio}</div><div class="mc-sub">C/P 거래량 비율</div><div class="mc-interp">${cpInterp}</div><span class="mc-tag tag-gray">● 시장 방향성</span></div>
     </div>
   </div>
 
@@ -586,16 +395,46 @@ function render(d,optType){
     <div class="alert-body">${d.alert_message}</div>
   </div>
 
+  <div class="signal-box ${sig.cls}">
+    <div class="signal-header">
+      <div class="signal-title">${sig.title}</div>
+      <div class="signal-badge">${sig.badge}</div>
+    </div>
+    <div class="signal-items">${sigItemsHtml}</div>
+    <div class="signal-disclaimer">⚠ 본 시그널은 변동성 지표 기반 교육 목적 참고 자료입니다. 실제 매매 결정은 추가적인 기술적·기본적 분석과 본인의 판단에 따라 이루어져야 합니다.</div>
+  </div>
+
   <div class="two-col">
     <div class="card">
       <div class="card-title">고평가 요인 분석</div>
       ${fbars}
     </div>
-    <div class="card">
-      <div class="card-title" id="volChartTitle">시장 변동성 추이</div>
-      <div class="ovx-explain" id="volExplain"></div>
-      <div class="ovx-bar-area">${ovxBarDivs}</div>
-      <div class="ovx-labels">${ovxLabelDivs}</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card">
+        <div class="card-title">IV vs HV 비교 분석</div>
+        <div class="iv-hv-row">
+          <div class="iv-hv-labels"><span class="iv-hv-name">${volTicker} 내재변동성</span><span class="iv-hv-val" style="color:#ff4438">${volCur}</span></div>
+          <div class="iv-hv-track"><div class="iv-hv-fill" style="width:${ivW}%;background:linear-gradient(90deg,#c03020,#ff4438)"><span>시장 기대 변동성</span></div></div>
+        </div>
+        <div class="iv-hv-row">
+          <div class="iv-hv-labels"><span class="iv-hv-name">HV 역사적 변동성</span><span class="iv-hv-val" style="color:#3a9fd8">${hv}</span></div>
+          <div class="iv-hv-track"><div class="iv-hv-fill" style="width:${hvW}%;background:linear-gradient(90deg,#185fa5,#3a9fd8)"><span>실제 가격 변동성</span></div></div>
+        </div>
+        <div class="iv-hv-diff">
+          <span class="iv-hv-diff-label">프리미엄 차이 (IV − HV)</span>
+          <span class="iv-hv-diff-val" style="color:${diffCol}">${diffSign}${hv_premium}pt</span>
+        </div>
+        <div class="iv-hv-interp">${ivHvInterpText}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">변동성 지수 히스토리</div>
+        <div class="ovx-bar-area">${ovxBarDivs}</div>
+        <div class="ovx-labels">${ovxLabelDivs}</div>
+        <div style="margin-top:14px;padding:12px 14px;background:var(--amber3);border:1px solid rgba(240,160,48,.15);border-radius:6px;">
+          <div style="font-family:var(--fc);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">📌 히스토리 맥락 해석</div>
+          <div style="font-family:var(--fb);font-size:12px;color:var(--t2);line-height:1.75;">${ovxContextText}</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -606,7 +445,6 @@ function render(d,optType){
 
   document.getElementById("dash").classList.add("on");
 }
-
 document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")run();});
 </script>
 </body>
