@@ -73,7 +73,7 @@ body{background:#0d0d0f;color:#f0f0f5;font-family:'Segoe UI',sans-serif;font-siz
 <div class="topbar">
   <span class="brand">🛢 원유 옵션 분석</span>
   <div class="input-group">
-    <input id="q" type="text" placeholder="원유 콜 / 원유 풋 입력...">
+    <input id="q" type="text" placeholder="예: 원유 콜, 골드 풋, S&P 콜, 천연가스 풋...">
     <button class="btn" id="btn" onclick="run()">분석 실행</button>
   </div>
 </div>
@@ -81,7 +81,7 @@ body{background:#0d0d0f;color:#f0f0f5;font-family:'Segoe UI',sans-serif;font-siz
   <div class="placeholder" id="ph">
     <div style="font-size:52px;margin-bottom:16px;">🛢</div>
     <h3 style="font-size:18px;color:#b0b0c0;margin-bottom:8px;">원유 옵션 프리미엄 분석기</h3>
-    <p style="font-size:13px;color:#555;line-height:1.8;">상단 입력창에 <code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:1px 6px;">원유 콜</code> 또는 <code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:1px 6px;">원유 풋</code>을 입력하고 분석 실행을 눌러주세요.</p>
+    <p style="font-size:13px;color:#555;line-height:1.8;">분석하고 싶은 종목과 옵션 종류를 입력하세요.<br><br><code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">원유 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">골드 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">S&P 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">천연가스 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">대두 콜</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">호주달러 풋</code> &nbsp;<code style="color:#f0a040;background:rgba(240,160,64,.1);border-radius:4px;padding:2px 8px;">국채 콜</code></p>
   </div>
   <div class="loading" id="ld"><div class="spinner"></div><div style="color:#707080;font-size:13px;" id="ldmsg">분석 중...</div></div>
   <div class="dash" id="dash"></div>
@@ -108,6 +108,8 @@ async function run(){
   const isPut=q.includes("풋")||q.toLowerCase().includes("put");
   if(!isCall&&!isPut){alert('"원유 콜" 또는 "원유 풋"을 입력해주세요.');return;}
   const optType=isCall?"콜":"풋";
+  const assetParam=encodeURIComponent(q.replace(/콜|풋|call|put/gi,'').trim()||'원유');
+  const assetParam=encodeURIComponent(q.replace(/콜|풋|call|put/gi,'').trim()||'원유');
   document.getElementById("ph").style.display="none";
   document.getElementById("dash").classList.remove("on");
   const ld=document.getElementById("ld");ld.classList.add("on");
@@ -115,7 +117,7 @@ async function run(){
   let mi=0;
   const iv=setInterval(()=>{document.getElementById("ldmsg").textContent=LM[Math.min(mi++,LM.length-1)];},1200);
   try{
-    const res=await fetch(`/analyze?option_type=${encodeURIComponent(optType)}`);
+    const res=await fetch(`/analyze?option_type=${encodeURIComponent(optType)}&asset=${assetParam}`);
     if(!res.ok)throw new Error(`서버 오류: ${res.status}`);
     const d=await res.json();
     if(d.error)throw new Error(d.error);
@@ -170,7 +172,7 @@ function render(d,optType){
   const iv_hv_ratio=d.iv_hv_ratio??d.hv_iv_ratio??1;
   document.getElementById("dash").innerHTML=`
     <div class="d-head">
-      <div><h2>🛢 원유 ${d.option_type||optType} 옵션 — 프리미엄 고평가 분석</h2><p>Yahoo Finance 실제 데이터 기반 밸류에이션 판정 결과</p></div>
+      <div><h2>${d.emoji||'🛢'} ${d.asset_name||'원유'} ${d.option_type||optType} 옵션 — 프리미엄 고평가 분석</h2><p>Yahoo Finance 실제 데이터 기반 밸류에이션 판정 결과</p></div>
       <div class="d-pill">${d.option_type||optType}</div>
     </div>
     <div class="top-row">
